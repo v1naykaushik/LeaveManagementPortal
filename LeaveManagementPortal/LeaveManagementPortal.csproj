@@ -188,11 +188,13 @@
     <Content Include="Global.asax" />
     <Content Include="Images\azadiLogo.png" />
     <Content Include="Images\cefipraLogo.png" />
+    <Content Include="Images\cefipraLogoBig.png" />
     <Content Include="Images\digitalIndiaLogo.png" />
     <Content Include="Images\dstLogo.png" />
     <Content Include="Images\franceFlag.png" />
     <Content Include="Images\indiaFlag.png" />
     <Content Include="Images\meaeLogo.png" />
+    <Content Include="PendingLeaveApprovals.aspx" />
     <Content Include="Login.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -419,6 +421,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="PendingLeaveApprovals.aspx.cs">
+      <DependentUpon>PendingLeaveApprovals.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PendingLeaveApprovals.aspx.designer.cs">
+      <DependentUpon>PendingLeaveApprovals.aspx</DependentUpon>
+    </Compile>
     <Compile Include="LeaveManagementPortalMaster.Master.cs">
       <DependentUpon>LeaveManagementPortalMaster.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -435,6 +444,7 @@
     </Compile>
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SandwichLeaveManager.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

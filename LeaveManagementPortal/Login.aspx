@@ -11,7 +11,7 @@
     <style>
         /* Header Styles */
         .main-header {
-            background: linear-gradient(to right, #e8f0fe, #d4e4fd);
+            background: #BDD7EE;
             padding: 10px 0;
             border-bottom: 1px solid #ccc;
         }

@@ -46,25 +46,21 @@ namespace LeaveManagementPortal
         {
             // Reset all menus to hidden by default
             EmployeeMenu.Visible = false;
-            ManagerMenu.Visible = false;
-            DirectorMenu.Visible = false;
+            AdminMenu.Visible = false;
 
             // Show appropriate menus based on role
             switch (userRole.ToLower())
             {
                 case "director":
-                    DirectorMenu.Visible = true;
-                    ManagerMenu.Visible = true;
-                    EmployeeMenu.Visible = true;
-                    break;
-
                 case "manager":
-                    ManagerMenu.Visible = true;
+                    AdminMenu.Visible = true;
                     EmployeeMenu.Visible = true;
+                    lnkDashboard.NavigateUrl = "~/AdminDashboard.aspx";
                     break;
 
                 case "employee":
                     EmployeeMenu.Visible = true;
+                    lnkDashboard.NavigateUrl = "~/Dashboard.aspx";
                     break;
 
                 default:
@@ -81,7 +77,7 @@ namespace LeaveManagementPortal
             string currentUrl = Request.Url.AbsolutePath.ToLower();
 
             // Remove active class from all links
-            foreach (Control panel in new Control[] { EmployeeMenu, ManagerMenu, DirectorMenu })
+            foreach (Control panel in new Control[] { EmployeeMenu, AdminMenu})
             {
                 if (panel is Panel)
                 {
@@ -96,7 +92,7 @@ namespace LeaveManagementPortal
             }
 
             // Find and mark the active link
-            foreach (Control panel in new Control[] { EmployeeMenu, ManagerMenu, DirectorMenu })
+            foreach (Control panel in new Control[] { EmployeeMenu, AdminMenu})
             {
                 if (panel is Panel)
                 {

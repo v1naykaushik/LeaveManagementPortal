@@ -42,13 +42,16 @@ namespace LeaveManagementPortal
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         ddlManager.Items.Clear();
-                        ddlManager.Items.Add(new System.Web.UI.WebControls.ListItem("", ""));
                         while (reader.Read())
                         {
                             ddlManager.Items.Add(new System.Web.UI.WebControls.ListItem(
                                 reader["Name"].ToString(),
                                 reader["UserID"].ToString()
                             ));
+                        }
+                        if (ddlManager.Items.Count > 0)
+                        {
+                            ddlManager.SelectedIndex = 0;
                         }
                     }
                 }

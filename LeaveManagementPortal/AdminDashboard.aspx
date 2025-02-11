@@ -9,6 +9,14 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 20px;
+            margin-top: 50px;
+        }
+        .page-title {
+            color: #1a237e;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 150px;
+            margin-bottom: 2rem;
         }
         .card-title {
             color: #1a237e;
@@ -31,13 +39,14 @@
             color: #666;
             font-style: italic;
         }
+        .imagecontainer {
+        }
     </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container-fluid">
-        <h2 class="mb-4">Dashboard</h2>
-        
+        <h2 class="page-title">Dashboard</h2>
         <div class="row">
             <!-- Today's Leaves -->
             <div class="col-md-6">

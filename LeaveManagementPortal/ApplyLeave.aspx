@@ -5,11 +5,17 @@
     <style>
         .form-container {
             max-width: 800px;
-            margin: 2rem auto;
+            margin-top: 150px;
             padding: 2rem;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .page-title {
+            color: #1a237e;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
         }
         .leave-type-balance {
             font-size: 0.9rem;
@@ -64,7 +70,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container">
         <div class="form-container">
-            <h2 class="mb-4">Apply Leave</h2>
+            <h2 class="page-title">Apply Leave</h2>
 
             <%-- Manager Warning Alert --%>
             <asp:Panel ID="pnlNoManager" runat="server" CssClass="alert alert-warning" Visible="false">
@@ -135,7 +141,7 @@
 
             <%-- Half Day Option --%>
             <div class="mb-4">
-                <asp:CheckBox ID="chkHalfDay" runat="server" Text=" Half Day Leave" 
+                <asp:CheckBox ID="chkHalfDay" runat="server" Text="  Half Day Leave" 
                     AutoPostBack="true" OnCheckedChanged="chkHalfDay_CheckedChanged" />
             </div>
 

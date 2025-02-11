@@ -28,6 +28,12 @@ namespace LeaveManagementPortal
         private void CheckManagerAssignment()
         {
             string userId = Session["UserID"]?.ToString();
+            string userRole = Session["UserRole"]?.ToString();
+
+            // Don't show warning for Director as they don't need a manager
+            if (string.IsNullOrEmpty(userId) || userRole?.ToLower() == "director")
+                return;
+
             if (string.IsNullOrEmpty(userId)) return;
 
             string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;

@@ -51,22 +51,22 @@ namespace LeaveManagementPortal
         protected global::System.Web.UI.WebControls.Panel EmployeeMenu;
 
         /// <summary>
-        /// ManagerMenu control.
+        /// lnkDashboard control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel ManagerMenu;
+        protected global::System.Web.UI.WebControls.HyperLink lnkDashboard;
 
         /// <summary>
-        /// DirectorMenu control.
+        /// AdminMenu control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel DirectorMenu;
+        protected global::System.Web.UI.WebControls.Panel AdminMenu;
 
         /// <summary>
         /// btnLogout control.

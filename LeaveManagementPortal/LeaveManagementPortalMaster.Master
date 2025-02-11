@@ -20,11 +20,24 @@
     </asp:ContentPlaceHolder>
 
     <style>
-        /* Header Styles */
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Header Styles background: linear-gradient(to right, #e8f0fe, #d4e4fd);  #BDD7EE*/
         .main-header {
-            background: linear-gradient(to right, #e8f0fe, #d4e4fd);
+            background: #BDD7EE;
             padding: 10px 0;
             border-bottom: 1px solid #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 130px;
+            z-index: 1000;
         }
 
         .header-left-logo {
@@ -52,14 +65,23 @@
             width: 130px;
         }
 
+        /* Wrapper for content and sidebar */
+        .page-wrapper {
+            padding-top: 140px; /* Same as header height */
+            padding-bottom: 80px; /* Same as footer height */
+            min-height: 100vh;
+            display: flex;
+        }
+
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
             background-color: #f8f9fa;
             border-right: 1px solid #dee2e6;
             position: fixed;
-            height: calc(100vh - 140px);
-            top: 80px;
+            left: 0;
+            top: 128px; /* Header height */
+            bottom: 80px; /* Footer height */
             overflow-y: auto;
         }
 
@@ -81,9 +103,10 @@
 
         /* Main Content Styles */
         .main-content {
-            margin-left: 250px;
+            margin-left: 250px; /* Sidebar width */
+            flex: 1;
             padding: 20px;
-            min-height: calc(100vh - 140px);
+            min-height: calc(100vh - 220px); /* 100vh - (header + footer) */
         }
 
         /* Footer Styles */
@@ -93,7 +116,10 @@
             padding: 10px 0;
             position: fixed;
             bottom: 0;
-            width: 100%;
+            left: 0;
+            right: 0;
+            height: 80px;
+            z-index: 1000;
         }
 
         .footer-logo {
@@ -116,6 +142,7 @@
 
         .user-name {
             font-weight: bold;
+            margin-top: 5px;
             margin-bottom: 5px;
         }
 
@@ -192,7 +219,7 @@
             <asp:Panel ID="EmployeeMenu" runat="server" CssClass="menu-section">
                 <div class="menu-section-title">Employee Menu</div>
                 <div class="nav flex-column">
-                    <asp:HyperLink runat="server" NavigateUrl="~/Dashboard.aspx" CssClass="nav-link">
+                    <asp:HyperLink ID="lnkDashboard" runat="server" NavigateUrl="~/Dashboard.aspx" CssClass="nav-link">
                         <i class="fas fa-home me-2"></i>Dashboard
                     </asp:HyperLink>
                     <asp:HyperLink runat="server" NavigateUrl="~/ApplyLeave.aspx" CssClass="nav-link">
@@ -207,37 +234,27 @@
                 </div>
             </asp:Panel>
 
-            <!-- Manager Menu Section -->
-            <asp:Panel ID="ManagerMenu" runat="server" CssClass="menu-section" Visible="false">
-                <div class="menu-section-title">Manager Menu</div>
+            <!-- Admin Menu Section -->
+            <asp:Panel ID="AdminMenu" runat="server" CssClass="menu-section" Visible="false">
+                <div class="menu-section-title">Admin Menu</div>
                 <div class="nav flex-column">
+                    <asp:HyperLink runat="server" NavigateUrl="~/PendingLeaveApprovals.aspx" CssClass="nav-link">
+                        <i class="fas fa-check-square me-2"></i>Pending Approval
+                    </asp:HyperLink>
+                    <asp:HyperLink runat="server" NavigateUrl="~/LeaveHistory.aspx" CssClass="nav-link">
+                        <i class="fas fa-history me-2"></i>Leave History
+                    </asp:HyperLink>
                     <asp:HyperLink runat="server" NavigateUrl="~/AddEmployee.aspx" CssClass="nav-link">
-                        <i class="fas fa-user-plus me-2"></i>Add New Employee
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/Manager/LeaveApprovals.aspx" CssClass="nav-link">
-                        <i class="fas fa-check-square me-2"></i>Leave Approvals
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/Manager/TeamLeaveHistory.aspx" CssClass="nav-link">
-                        <i class="fas fa-users me-2"></i>Team Leave History
-                    </asp:HyperLink>
-                </div>
-            </asp:Panel>
-
-            <!-- Director Menu Section -->
-            <asp:Panel ID="DirectorMenu" runat="server" CssClass="menu-section" Visible="false">
-                <div class="menu-section-title">Director Menu</div>
-                <div class="nav flex-column">
-                    <asp:HyperLink runat="server" NavigateUrl="~/Admin/AddEmployee.aspx" CssClass="nav-link">
-                        <i class="fas fa-user-plus me-2"></i>Add New Employee
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/Director/AllEmployeeLeaves.aspx" CssClass="nav-link">
-                        <i class="fas fa-clipboard-list me-2"></i>All Employee Leaves
+                        <i class="fas fa-user-plus me-2"></i>Add Employee
                     </asp:HyperLink>
                 </div>
             </asp:Panel>
 
             <!-- Logout Button -->
-            <asp:LinkButton ID="btnLogout" runat="server" CssClass="btn btn-outline-primary logout-btn" OnClick="btnLogout_Click">
+            <asp:LinkButton ID="btnLogout" runat="server" 
+                CssClass="btn btn-outline-primary logout-btn"
+                OnClick="btnLogout_Click"
+                CausesValidation="false">
                 <i class="fas fa-sign-out-alt me-2"></i>Logout
             </asp:LinkButton>
         </div>

@@ -10,6 +10,13 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 20px;
             margin-bottom: 20px;
+            margin-top: 100px;
+        }
+        .page-title {
+            color: #1a237e;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
         }
         .card-title {
             color: #1a237e;
@@ -55,7 +62,7 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container-fluid">
-        <h2 class="mb-4">My Dashboard</h2>
+        <h2 class="page-title">My Dashboard</h2>
         
         <div class="row">
             <div class="col-md-6">
