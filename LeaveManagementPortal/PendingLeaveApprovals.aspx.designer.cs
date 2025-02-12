@@ -51,6 +51,15 @@ namespace LeaveManagementPortal
         protected global::System.Web.UI.WebControls.Button btnSaveChanges;
 
         /// <summary>
+        /// btnTestApprove control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnTestApprove;
+
+        /// <summary>
         /// hdnPendingActions control.
         /// </summary>
         /// <remarks>
@@ -58,5 +67,14 @@ namespace LeaveManagementPortal
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hdnPendingActions;
+
+        /// <summary>
+        /// lblDebugHidden control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDebugHidden;
     }
 }

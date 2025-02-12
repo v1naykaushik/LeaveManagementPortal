@@ -302,12 +302,13 @@ namespace LeaveManagementPortal
                 args.IsValid = false;
             }
         }
-
+            
         protected void btnApplyLeave_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid) return;
 
             string userId = Session["UserID"]?.ToString();
+
             if (string.IsNullOrEmpty(userId))
             {
                 Response.Redirect("~/Login.aspx");
@@ -330,7 +331,7 @@ namespace LeaveManagementPortal
             }
 
             // For Medical Leave, we don't need to check LOP balance as it's handled automatically
-            if (leaveTypeId != "5" && leaveTypeId != "3") // Not LOP or Medical vinay. check this medical rule here
+            if (leaveTypeId != "5" && leaveTypeId != "3") // Not LOP or Medical vinay note: check this medical rule here
             {
                 // Check if user has sufficient balance
                 if (!HasSufficientBalance(userId, leaveTypeId, duration))
@@ -348,7 +349,36 @@ namespace LeaveManagementPortal
                     lblError.Text = "Selected date is not a restricted holiday.";
                     return;
                 }
-            }   
+            }
+
+            string userRole = Session["UserRole"]?.ToString();
+            string initialStatus;
+            string managerApprovalStatus;
+            string directorApprovalStatus;
+
+            switch (userRole?.ToLower())
+            {
+                case "director":
+                    // Director's leaves are auto-approved at both levels
+                    initialStatus = "Approved";
+                    managerApprovalStatus = "Approved";
+                    directorApprovalStatus = "Approved";
+                    break;
+
+                case "manager":
+                    // Manager's leaves are auto-approved at manager level only
+                    initialStatus = "Pending";
+                    managerApprovalStatus = "Approved";
+                    directorApprovalStatus = "Pending";
+                    break;
+
+                default:
+                    // Regular employee leaves start as pending
+                    initialStatus = "Pending";
+                    managerApprovalStatus = "Pending";
+                    directorApprovalStatus = "Pending";
+                    break;
+            }
 
             string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -358,8 +388,11 @@ namespace LeaveManagementPortal
                 {
                     try
                     {
+                        int newLeaveId = 0;
                         // Insert leave application
                         using (SqlCommand cmd = new SqlCommand(@"
+                            DECLARE @NewLeaveID int;
+
                             INSERT INTO LeaveApplications (
                                 UserID, LeaveTypeID, StartDate, EndDate, 
                                 Duration, IsHalfDay, Status, 
@@ -367,9 +400,20 @@ namespace LeaveManagementPortal
                             )
                             VALUES (
                                 @UserID, @LeaveTypeID, @StartDate, @EndDate,
-                                @Duration, @IsHalfDay, 'Pending',
-                                'Pending', 'Pending', @Reason
-                            )", conn, transaction))
+                                @Duration, @IsHalfDay, @Status,
+                                @ManagerApprovalStatus, @DirectorApprovalStatus, @Reason
+                            );
+    
+                            SET @NewLeaveID = SCOPE_IDENTITY();
+    
+                            -- Double verify this is the correct leave
+                            SELECT @NewLeaveID WHERE EXISTS (
+                                SELECT 1 FROM LeaveApplications 
+                                WHERE LeaveID = @NewLeaveID 
+                                AND UserID = @UserID 
+                                AND StartDate = @StartDate
+                                AND EndDate = @EndDate
+                            );", conn, transaction))
                         {
                             cmd.Parameters.AddWithValue("@UserID", userId);
                             cmd.Parameters.AddWithValue("@LeaveTypeID", leaveTypeId);
@@ -377,6 +421,9 @@ namespace LeaveManagementPortal
                             cmd.Parameters.AddWithValue("@EndDate", endDate);
                             cmd.Parameters.AddWithValue("@Duration", duration);
                             cmd.Parameters.AddWithValue("@IsHalfDay", chkHalfDay.Checked);
+                            cmd.Parameters.AddWithValue("@Status", initialStatus);
+                            cmd.Parameters.AddWithValue("@ManagerApprovalStatus", managerApprovalStatus);
+                            cmd.Parameters.AddWithValue("@DirectorApprovalStatus", directorApprovalStatus);
                             if (string.IsNullOrWhiteSpace(txtReason.Text))
                             {
                                 cmd.Parameters.AddWithValue("@Reason", DBNull.Value);
@@ -386,7 +433,8 @@ namespace LeaveManagementPortal
                                 cmd.Parameters.AddWithValue("@Reason", txtReason.Text.Trim());
                             }
 
-                            cmd.ExecuteNonQuery();
+                            var result = cmd.ExecuteScalar();
+                            newLeaveId = result != null ? Convert.ToInt32(result) : 0;
                         }
 
                         // If it's a medical leave, create LOP entry
@@ -394,7 +442,7 @@ namespace LeaveManagementPortal
                         {
                             // Calculate LOP duration as half of medical leave duration
                             decimal lopDuration = duration * 0.5m;
-
+                            // LOP leave type is 5
                             using (SqlCommand cmd = new SqlCommand(@"
                                 INSERT INTO LeaveApplications (
                                     UserID, LeaveTypeID, StartDate, EndDate,
@@ -411,13 +459,32 @@ namespace LeaveManagementPortal
                                 cmd.Parameters.AddWithValue("@StartDate", startDate);
                                 cmd.Parameters.AddWithValue("@EndDate", endDate);
                                 cmd.Parameters.AddWithValue("@LopDuration", lopDuration);
-                                cmd.Parameters.AddWithValue("@Reason", "Auto generated LOP. Its Duration is half of Medical leaves applied in same date range.");
+                                cmd.Parameters.AddWithValue("@IsHalfDay", chkHalfDay.Checked);
+                                cmd.Parameters.AddWithValue("@Status", initialStatus);
+                                cmd.Parameters.AddWithValue("@ManagerApprovalStatus", managerApprovalStatus);
+                                cmd.Parameters.AddWithValue("@DirectorApprovalStatus", directorApprovalStatus);
+                                cmd.Parameters.AddWithValue("@Reason", "System generated LOP. Its Duration is half of Medical leaves applied in same date range.");
 
                                 cmd.ExecuteNonQuery();
                             }
 
                         }
-                            transaction.Commit();
+
+                        // Process sandwich rule for Director's auto-approved leaves
+                        if (userRole?.ToLower() == "director" && newLeaveId != 0)
+                        {
+                            try
+                            {
+                                SandwichLeaveManager sandwichManager = new SandwichLeaveManager();
+                                sandwichManager.ProcessSandwichRule(newLeaveId);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Sandwich rule processing error for Director's leave: {ex.Message}");
+                                // Don't throw the exception as it's not critical to leave creation
+                            }
+                        }
+                        transaction.Commit();
 
                         // Clear form and show success message
                         ddlLeaveType.SelectedIndex = 0;
