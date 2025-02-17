@@ -237,7 +237,7 @@ namespace LeaveManagementPortal
         protected void btnSaveChanges_Click(object sender, EventArgs e)
         {
             string actionsJson = hdnPendingActions.Value;
-            System.Diagnostics.Debug.WriteLine($"Received JSON: {actionsJson}");
+            string userRole = Session["UserRole"]?.ToString();
 
             if (string.IsNullOrEmpty(actionsJson))
             {
@@ -249,34 +249,146 @@ namespace LeaveManagementPortal
             {
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 var data = serializer.Deserialize<Dictionary<string, object>>(actionsJson);
-
-                // Directly cast the actions object instead of trying to deserialize it again
                 var actions = data["actions"] as Dictionary<string, object>;
-                System.Diagnostics.Debug.WriteLine($"Actions dictionary: {string.Join(", ", actions.Select(a => $"{a.Key}:{a.Value}"))}");
 
                 string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    foreach (var action in actions)
+                    using (SqlTransaction transaction = conn.BeginTransaction())
                     {
-                        using (SqlCommand cmd = new SqlCommand(@"
-                            UPDATE LeaveApplications 
-                            SET ManagerApprovalStatus = @Status,
-                                LastModifiedDate = GETDATE()
-                            WHERE LeaveID = @LeaveID", conn))
+                        try
                         {
-                            cmd.Parameters.AddWithValue("@Status", action.Value.ToString() == "approve" ? "Approved" : "Rejected");
-                            cmd.Parameters.AddWithValue("@LeaveID", Convert.ToInt32(action.Key));
+                            foreach (var action in actions)
+                            {
+                                // First check if leave is already rejected
+                                bool isAlreadyRejected = false;
+                                using (SqlCommand checkCmd = new SqlCommand(@"
+                            SELECT Status, ManagerApprovalStatus, DirectorApprovalStatus 
+                            FROM LeaveApplications 
+                            WHERE LeaveID = @LeaveID", conn, transaction))
+                                {
+                                    checkCmd.Parameters.AddWithValue("@LeaveID", Convert.ToInt32(action.Key));
+                                    using (SqlDataReader reader = checkCmd.ExecuteReader())
+                                    {
+                                        if (reader.Read())
+                                        {
+                                            isAlreadyRejected =
+                                                reader["Status"].ToString() == "Rejected" ||
+                                                reader["ManagerApprovalStatus"].ToString() == "Rejected" ||
+                                                reader["DirectorApprovalStatus"].ToString() == "Rejected";
+                                        }
+                                    }
+                                }
 
-                            int rowsAffected = cmd.ExecuteNonQuery();
-                            System.Diagnostics.Debug.WriteLine($"Leave {action.Key} status set to {action.Value}, rows affected: {rowsAffected}");
+                                // Skip if already rejected
+                                if (isAlreadyRejected)
+                                {
+                                    continue;
+                                }
+                                System.Diagnostics.Debug.WriteLine($"Processing action - Role: {userRole}, Action: {action.Value}, LeaveID: {action.Key}");
+                                using (SqlCommand cmd = new SqlCommand(@"
+                                    UPDATE LeaveApplications 
+                                    SET LastModifiedDate = GETDATE(),
+                                        Status = CASE 
+                                            WHEN @Action = 'reject' THEN 'Rejected'
+                                            WHEN @UserRole = 'Director' AND @Action = 'approve' THEN 'Approved'
+                                            WHEN @UserRole = 'Manager' AND @Action = 'approve' AND DirectorApprovalStatus = 'Approved' THEN 'Approved'
+                                            WHEN @UserRole = 'Manager' AND @Action = 'approve' THEN 'Pending'
+                                            ELSE Status
+                                        END,
+                                        DirectorApprovalStatus = CASE 
+                                            WHEN @UserRole = 'Director' THEN 
+                                                CASE @Action 
+                                                    WHEN 'approve' THEN 'Approved'
+                                                    WHEN 'reject' THEN 'Rejected'
+                                                    ELSE DirectorApprovalStatus 
+                                                END
+                                            WHEN @UserRole = 'Manager' AND @Action = 'reject' THEN 'Pending'
+                                            ELSE DirectorApprovalStatus 
+                                        END,
+                                        ManagerApprovalStatus = CASE 
+                                            WHEN @UserRole = 'Manager' THEN 
+                                                CASE @Action 
+                                                    WHEN 'approve' THEN 'Approved'
+                                                    WHEN 'reject' THEN 'Rejected'
+                                                    ELSE ManagerApprovalStatus 
+                                                END
+                                            WHEN @UserRole = 'Director' AND ManagerApprovalStatus = 'Pending' THEN 'Pending'
+                                            ELSE ManagerApprovalStatus 
+                                        END,
+                                        -- Insert the date updates here, after all status updates
+                                        DirectorApprovalDate = CASE 
+                                            WHEN @UserRole = 'Director' AND (@Action = 'approve' OR @Action = 'reject') THEN GETDATE()
+                                            ELSE DirectorApprovalDate 
+                                        END,
+                                        ManagerApprovalDate = CASE 
+                                            WHEN @UserRole = 'Manager' AND (@Action = 'approve' OR @Action = 'reject') THEN GETDATE()
+                                            ELSE ManagerApprovalDate 
+                                        END
+                                    WHERE LeaveID = @LeaveID", conn, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@Action", action.Value.ToString());
+                                    cmd.Parameters.AddWithValue("@LeaveID", Convert.ToInt32(action.Key));
+                                    cmd.Parameters.AddWithValue("@UserRole", userRole);
+
+                                    int rowsAffected = cmd.ExecuteNonQuery();
+                                    using (SqlCommand verifyCmd = new SqlCommand(@"
+                                        SELECT ManagerApprovalDate, DirectorApprovalDate 
+                                        FROM LeaveApplications 
+                                        WHERE LeaveID = @LeaveID", conn, transaction))
+                                    {
+                                        verifyCmd.Parameters.AddWithValue("@LeaveID", Convert.ToInt32(action.Key));
+                                        using (SqlDataReader reader = verifyCmd.ExecuteReader())
+                                        {
+                                            if (reader.Read())
+                                            {
+                                                System.Diagnostics.Debug.WriteLine($"After update - ManagerApprovalDate: {reader["ManagerApprovalDate"]}, DirectorApprovalDate: {reader["DirectorApprovalDate"]}");
+                                            }
+                                        }
+                                    }
+                                    System.Diagnostics.Debug.WriteLine($"Leave {action.Key} updated. Rows affected: {rowsAffected}");
+
+                                    // Check for sandwich rule only if it's an approval and action succeeded
+                                    if (rowsAffected > 0 && action.Value.ToString() == "approve")
+                                    {
+                                        CheckAndProcessSandwichRule(Convert.ToInt32(action.Key), conn, transaction);
+                                    }
+                                }
+                            }
+
+                            transaction.Commit();
+
+                            // Process any pending sandwich leaves after transaction commits
+                            if (System.Web.HttpContext.Current.Session["PendingSandwichLeaveId"] != null)
+                            {
+                                try
+                                {
+                                    int sandwichLeaveId = (int)System.Web.HttpContext.Current.Session["PendingSandwichLeaveId"];
+                                    SandwichLeaveManager sandwichManager = new SandwichLeaveManager();
+                                    sandwichManager.ProcessSandwichRule(sandwichLeaveId);
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"Sandwich rule processing error: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    System.Web.HttpContext.Current.Session.Remove("PendingSandwichLeaveId");
+                                }
+                            }
+
+                            LoadPendingLeaves();
+                            ScriptManager.RegisterStartupScript(this, GetType(), "UpdateSuccess",
+                                "alert('Leave status updated successfully.'); clearSelected();", true);
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            System.Diagnostics.Debug.WriteLine($"Transaction error: {ex.Message}");
+                            throw;
                         }
                     }
-
-                    LoadPendingLeaves();
-                    ScriptManager.RegisterStartupScript(this, GetType(), "UpdateSuccess",
-                        "alert('Selected leaves have been updated successfully.');", true);
                 }
             }
             catch (Exception ex)
@@ -284,6 +396,41 @@ namespace LeaveManagementPortal
                 System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
                 ScriptManager.RegisterStartupScript(this, GetType(), "UpdateError",
                     "alert('Error updating leave statuses.');", true);
+            }
+        }
+
+        private void CheckAndProcessSandwichRule(int leaveId, SqlConnection conn, SqlTransaction transaction)
+        {
+            // First check if the leave is fully approved using the current transaction
+            using (SqlCommand cmd = new SqlCommand(@"
+                SELECT 
+                    LA.Status,
+                    LA.ManagerApprovalStatus,
+                    LA.DirectorApprovalStatus,
+                    LA.UserID,
+                    LA.StartDate,
+                    LA.EndDate
+                FROM LeaveApplications LA
+                WHERE LA.LeaveID = @LeaveID
+                AND LA.Status = 'Approved'
+                AND LA.ManagerApprovalStatus = 'Approved'
+                AND LA.DirectorApprovalStatus = 'Approved'", conn, transaction))
+            {
+                cmd.Parameters.AddWithValue("@LeaveID", leaveId);
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        // If we found a fully approved leave, process it after the current transaction completes
+                        var userId = Convert.ToInt32(reader["UserID"]);
+                        var startDate = Convert.ToDateTime(reader["StartDate"]);
+                        var endDate = Convert.ToDateTime(reader["EndDate"]);
+
+                        // Store these values to process after transaction commits
+                        System.Web.HttpContext.Current.Session["PendingSandwichLeaveId"] = leaveId;
+                    }
+                }
             }
         }
 

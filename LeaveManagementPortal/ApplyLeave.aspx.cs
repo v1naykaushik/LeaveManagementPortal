@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text;
+using System.Web.Script.Serialization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
@@ -19,9 +22,65 @@ namespace LeaveManagementPortal
                 // Load leave types with balances
                 LoadLeaveTypes();
 
+                CacheExistingLeaves();
+
                 // Set minimum date for calendar
                 txtStartDate.Attributes["min"] = DateTime.Today.ToString("yyyy-MM-dd");
                 txtEndDate.Attributes["min"] = DateTime.Today.ToString("yyyy-MM-dd");
+            }
+        }
+
+        private List<LeaveDate> CachedLeaves
+        {
+            get { return ViewState["CachedLeaves"] as List<LeaveDate> ?? new List<LeaveDate>(); }
+            set { ViewState["CachedLeaves"] = value; }
+        }
+
+        // Class to store leave dates
+        [Serializable]
+        private class LeaveDate
+        {
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+        }
+
+        private void CacheExistingLeaves()
+        {
+            string userId = Session["UserID"]?.ToString();
+            string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(@"
+            SELECT StartDate, EndDate
+            FROM LeaveApplications
+            WHERE UserID = @UserID 
+            AND Status IN ('Approved', 'Pending')
+            AND EndDate >= @CurrentDate", conn))
+                {
+                    cmd.Parameters.AddWithValue("@UserID", userId);
+                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Today);
+
+                    var leaveList = new List<LeaveDate>();
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            leaveList.Add(new LeaveDate
+                            {
+                                StartDate = Convert.ToDateTime(reader["StartDate"]),
+                                EndDate = Convert.ToDateTime(reader["EndDate"])
+                            });
+                        }
+                    }
+
+                    // Store in ViewState
+                    CachedLeaves = leaveList;
+
+                    System.Diagnostics.Debug.WriteLine($"Cached {leaveList.Count} future leaves");
+                }
             }
         }
 
@@ -224,6 +283,7 @@ namespace LeaveManagementPortal
             if (!ValidateLeaveOverlap(startDate, endDate))
             {
                 lblError.Text = "Selected dates overlap with an existing leave application.";
+                txtStartDate.Text = "";
                 txtEndDate.Text = "";
                 return;
             }
@@ -233,33 +293,18 @@ namespace LeaveManagementPortal
 
         private bool ValidateLeaveOverlap(DateTime startDate, DateTime endDate)
         {
-            string userId = Session["UserID"]?.ToString();
-            if (string.IsNullOrEmpty(userId)) return false;
-
-            string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            // Use cached leaves instead of querying database again
+            foreach (var leave in CachedLeaves)
             {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT COUNT(*)
-                    FROM LeaveApplications
-                    WHERE UserID = @UserID
-                    AND Status NOT IN ('Cancelled', 'Rejected')
-                    AND (
-                        (@StartDate BETWEEN StartDate AND EndDate)
-                        OR (@EndDate BETWEEN StartDate AND EndDate)
-                        OR (StartDate BETWEEN @StartDate AND @EndDate)
-                        OR (EndDate BETWEEN @StartDate AND @EndDate)
-                    )", conn))
+                if ((startDate >= leave.StartDate && startDate <= leave.EndDate) ||
+                    (endDate >= leave.StartDate && endDate <= leave.EndDate) ||
+                    (startDate <= leave.StartDate && endDate >= leave.StartDate) ||
+                    (leave.StartDate <= startDate && leave.EndDate >= startDate))
                 {
-                    cmd.Parameters.AddWithValue("@UserID", userId);
-                    cmd.Parameters.AddWithValue("@StartDate", startDate);
-                    cmd.Parameters.AddWithValue("@EndDate", endDate);
-
-                    int overlapCount = (int)cmd.ExecuteScalar();
-                    return overlapCount == 0;
+                    return false; // Overlap found
                 }
             }
+            return true; // No overlap
         }
 
         protected void chkHalfDay_CheckedChanged(object sender, EventArgs e)

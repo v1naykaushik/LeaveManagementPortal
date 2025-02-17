@@ -540,6 +540,17 @@
             // Store action for this leave ID
             selectedActions[leaveId] = action;
 
+            // code for button fading
+            const approveBtn = document.querySelector(`button[onclick*="markForAction(${leaveId}, 'approve')"]`);
+            const rejectBtn = document.querySelector(`button[onclick*="markForAction(${leaveId}, 'reject')"]`);
+            if (action === 'approve') {
+                approveBtn.classList.remove('faded');
+                rejectBtn.classList.add('faded');
+            } else {
+                approveBtn.classList.add('faded');
+                rejectBtn.classList.remove('faded');
+            }
+
             // Find and check the checkbox
             const checkbox = document.querySelector(`.tile-checkbox[data-leaveid="${leaveId}"]`);
             if (checkbox) {
