@@ -46,11 +46,30 @@ namespace LeaveManagementPortal
                 try
                 {
                     string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
-
                     using (SqlConnection conn = new SqlConnection(connectionString))
                     {
                         conn.Open();
 
+                        // ADD THIS NEW BLOCK: Check if account exists but is inactive
+                        using (SqlCommand checkActiveCmd = new SqlCommand(@"
+                    SELECT IsActive 
+                    FROM Users 
+                    WHERE Email = @Email", conn))
+                        {
+                            checkActiveCmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
+
+                            using (SqlDataReader reader = checkActiveCmd.ExecuteReader())
+                            {
+                                if (reader.Read() && !Convert.ToBoolean(reader["IsActive"]))
+                                {
+                                    lblError.Text = "This account is inactive. Please contact your admin.";
+                                    return;
+                                }
+                            }
+                        }
+                        // END OF NEW BLOCK
+
+                        // Existing credential check code remains exactly the same
                         using (SqlCommand cmd = new SqlCommand(@"
                     SELECT UserID, Name, Email, Role, ManagerID 
                     FROM Users 

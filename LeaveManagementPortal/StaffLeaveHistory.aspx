@@ -24,6 +24,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             overflow-x: auto;
+            margin-bottom: 50px;
         }
 
         .leave-table {
@@ -89,13 +90,9 @@
             transition: background-color 0.3s;
         }
 
-        .btn-pdf {
-            background-color: #f44336;
-            color: white;
-        }
-
-        .btn-word {
-            background-color: #2196f3;
+        .btn-excel {
+            margin-left: 28px;
+            background-color: #57a14a;
             color: white;
         }
 
@@ -189,10 +186,8 @@
 
         <!-- Export Buttons -->
         <div class="export-buttons">
-            <asp:Button ID="btnExportPDF" runat="server" Text="Export to PDF" 
-                CssClass="export-btn btn-pdf" OnClick="btnExportPDF_Click" />
-            <asp:Button ID="btnExportWord" runat="server" Text="Export to Word" 
-                CssClass="export-btn btn-word" OnClick="btnExportWord_Click" />
+            <asp:Button ID="btnExportExcel" runat="server" Text="Export to Excel" 
+                CssClass="export-btn btn-excel" OnClick="btnExportExcel_Click" />
         </div>
 
         <!-- Leave History Table -->
@@ -224,4 +219,18 @@
             </asp:GridView>
         </div>
     </div>
+
+    <script type="text/javascript">
+        // Make date range field clickable
+        document.addEventListener('DOMContentLoaded', function() {
+            var dateField = document.getElementById('<%= txtDateRange.ClientID %>');
+            if (dateField) {
+                dateField.addEventListener('click', function() {
+                    this.showPicker();
+                });
+            }
+        });
+    </script>
 </asp:Content>
+
+<%-- 'Half Day' : Math.round(duration) + (duration === '1.0' ? ' day' : ' days' --%>

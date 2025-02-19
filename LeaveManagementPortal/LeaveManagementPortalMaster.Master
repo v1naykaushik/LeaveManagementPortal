@@ -241,11 +241,14 @@
                     <asp:HyperLink runat="server" NavigateUrl="~/PendingLeaveApprovals.aspx" CssClass="nav-link">
                         <i class="fas fa-check-square me-2"></i>Pending Approval
                     </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/AdminLeaveHistory.aspx" CssClass="nav-link">
+                    <asp:HyperLink runat="server" NavigateUrl="~/StaffLeaveHistory.aspx" CssClass="nav-link">
                         <i class="fas fa-history me-2"></i>Staff Leave History
                     </asp:HyperLink>
                     <asp:HyperLink runat="server" NavigateUrl="~/AddEmployee.aspx" CssClass="nav-link">
                         <i class="fas fa-user-plus me-2"></i>Add Employee
+                    </asp:HyperLink>
+                    <asp:HyperLink runat="server" NavigateUrl="~/ManageEmployees.aspx" CssClass="nav-link">
+                        <i class="fas fa-users-cog me-2"></i>Manage Employees
                     </asp:HyperLink>
                 </div>
             </asp:Panel>

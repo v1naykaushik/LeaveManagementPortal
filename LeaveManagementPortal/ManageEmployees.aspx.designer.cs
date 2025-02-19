@@ -11,79 +11,88 @@ namespace LeaveManagementPortal
 {
 
 
-    public partial class StaffLeaveHistory
+    public partial class ManageEmployees
     {
 
         /// <summary>
-        /// ddlEmployee control.
+        /// UpdatePanel1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlEmployee;
+        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
 
         /// <summary>
-        /// ddlLeaveType control.
+        /// gvEmployees control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlLeaveType;
+        protected global::System.Web.UI.WebControls.GridView gvEmployees;
 
         /// <summary>
-        /// ddlStatus control.
+        /// pnlPassword control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
+        protected global::System.Web.UI.WebControls.Panel pnlPassword;
 
         /// <summary>
-        /// txtDateRange control.
+        /// btnCloseModal control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtDateRange;
+        protected global::System.Web.UI.WebControls.Button btnCloseModal;
 
         /// <summary>
-        /// btnFilter control.
+        /// txtDirectorPassword control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnFilter;
+        protected global::System.Web.UI.WebControls.TextBox txtDirectorPassword;
 
         /// <summary>
-        /// btnClear control.
+        /// hdnSelectedUserId control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnClear;
+        protected global::System.Web.UI.WebControls.HiddenField hdnSelectedUserId;
 
         /// <summary>
-        /// btnExportExcel control.
+        /// lblPasswordError control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnExportExcel;
+        protected global::System.Web.UI.WebControls.Label lblPasswordError;
 
         /// <summary>
-        /// gvLeaveHistory control.
+        /// btnCancelPassword control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvLeaveHistory;
+        protected global::System.Web.UI.WebControls.Button btnCancelPassword;
+
+        /// <summary>
+        /// btnVerifyPassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnVerifyPassword;
     }
 }
