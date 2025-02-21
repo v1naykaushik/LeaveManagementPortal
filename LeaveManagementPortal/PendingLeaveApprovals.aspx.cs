@@ -63,7 +63,18 @@ namespace LeaveManagementPortal
             }
         }
 
-        private void LoadPendingLeaves()
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            LoadPendingLeaves(txtSearch.Value.Trim());
+        }
+
+        protected void btnClearSearch_Click(object sender, EventArgs e)
+        {
+            txtSearch.Value = "";
+            LoadPendingLeaves();
+        }
+
+        private void LoadPendingLeaves(string searchTerm = "")
         {
             string userRole = Session["UserRole"]?.ToString();
             string userId = Session["UserID"]?.ToString();
@@ -104,13 +115,24 @@ namespace LeaveManagementPortal
                 // 2. Leave is in Pending status
                 // 3. Manager approval is still Pending
                 // 4. Director hasn't already approved/rejected it
+
+                // Add search condition if search term exists
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    query += @" AND (
+                        u.Name LIKE @SearchTerm 
+                        OR lt.LeaveTypeName LIKE @SearchTerm
+                        OR lt.LeaveTypeID LIKE @SearchTerm
+                    )";
+                }
+
                 if (userRole == "Manager")
                 {
                     query += @"
-                AND u.ManagerID = @UserID 
-                AND la.Status = 'Pending'
-                AND la.ManagerApprovalStatus = 'Pending'
-                AND la.DirectorApprovalStatus = 'Pending'";
+                        AND u.ManagerID = @UserID 
+                        AND la.Status = 'Pending'
+                        AND la.ManagerApprovalStatus = 'Pending'
+                        AND la.DirectorApprovalStatus = 'Pending'";
                 }
                 // For Director: Show leaves where
                 // 1. Leave is in Pending status
@@ -131,6 +153,12 @@ namespace LeaveManagementPortal
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
+                    // Add search parameter if needed
+                    if (!string.IsNullOrWhiteSpace(searchTerm))
+                    {
+                        cmd.Parameters.AddWithValue("@SearchTerm", "%" + searchTerm + "%");
+                    }
+
                     if (userRole == "Manager")
                     {
                         cmd.Parameters.AddWithValue("@UserID", userId);

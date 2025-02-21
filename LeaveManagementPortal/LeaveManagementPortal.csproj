@@ -275,6 +275,7 @@
     <Content Include="Account\VerifyPhoneNumber.aspx" />
     <Content Include="AddEmployee.aspx" />
     <Content Include="AdminDashboard.aspx" />
+    <Content Include="Images\cefipraLogo.png" />
     <Content Include="ManageEmployees.aspx" />
     <Content Include="StaffLeaveHistory.aspx" />
     <Content Include="ApplyLeave.aspx" />
@@ -302,8 +303,6 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\azadiLogo.png" />
-    <Content Include="Images\cefipraLogo.png" />
-    <Content Include="Images\cefipraLogoBig.png" />
     <Content Include="Images\digitalIndiaLogo.png" />
     <Content Include="Images\dstLogo.png" />
     <Content Include="Images\franceFlag.png" />

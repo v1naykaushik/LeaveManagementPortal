@@ -52,7 +52,6 @@
             cursor: pointer;
             background-color: #fff;
         }
-    
         .date-field::-webkit-calendar-picker-indicator {
             position: absolute;
             right: 10px;
@@ -60,10 +59,10 @@
             transform: translateY(-50%);
             cursor: pointer;
         }
-
         .date-field-container {
             position: relative;
         }
+            
     </style>
 </asp:Content>
 

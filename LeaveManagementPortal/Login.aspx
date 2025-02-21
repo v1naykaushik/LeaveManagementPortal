@@ -29,6 +29,10 @@
             height: 30px;
             margin: 0 5px;
         }
+        .header-cefipralogo {
+            height: 40px;
+            margin: 0 5px;
+        }
 
         .header-org-name {
             font-size: 24px;
@@ -108,7 +112,7 @@
         }
 
         .validation-message {
-            color: #dc3545;footer
+            color: #dc3545;
             font-size: 0.875rem;
             margin-top: 0.25rem;
         }
@@ -153,7 +157,7 @@
                     <div class="col-md-8">
                         <div class="header-flags-container">
                             <img src="Images/indiaFlag.png" alt="Flag 1" class="header-flag" />
-                            <img src="Images/cefipraLogo.png" alt="Flag 2" class="header-flag" />
+                            <img src="Images/cefipraLogo.png" alt="Flag 2" class="header-cefipralogo" />
                             <img src="Images/franceFlag.png" alt="Flag 3" class="header-flag" />
                         </div>
                         <div class="header-org-name">

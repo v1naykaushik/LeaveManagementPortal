@@ -135,10 +135,10 @@
             transition: opacity 0.3s ease;
         }
 
-            .btn-approve.faded, .btn-reject.faded {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
+        .btn-approve.faded, .btn-reject.faded {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
         .batch-actions {
             background: #f8f9fa;
@@ -163,6 +163,14 @@
             border-top: 1px solid rgba(255,255,255,0.1); /* Subtle top border */
         }
 
+        .search-container .input-group {
+            min-width: 300px;
+        }
+
+        .search-container .btn {
+            min-width: 70px;
+        }
+
         .selection-count {
             color: white;
             font-size: 0.9rem;
@@ -177,10 +185,10 @@
             cursor: pointer;
         }
 
-            .btn-save:disabled {
-                background-color: #cccccc;
-                cursor: not-allowed;
-            }
+        .btn-save:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
 
         /* Add padding to main content to prevent overlap with fixed footer */
         .container-fluid {
@@ -316,6 +324,19 @@
                     <button type="button" class="btn btn-secondary" onclick="clearSelected()">
                         <i class="fas fa-undo me-1"></i>Clear Selected
                     </button>
+                </div>
+
+                <div class="search-container">
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" ID="txtSearch" runat="server" 
+                            class="form-control" placeholder="Search employee or leave type" />
+                        <asp:Button ID="btnSearch" runat="server" 
+                            Text="Search" CssClass="btn btn-primary" 
+                            OnClick="btnSearch_Click" />
+                        <asp:Button ID="btnClearSearch" runat="server" 
+                            Text="Clear" CssClass="btn btn-outline-secondary" 
+                            OnClick="btnClearSearch_Click" />
+                    </div>
                 </div>
 
                 <!-- Pending Leaves Grid -->

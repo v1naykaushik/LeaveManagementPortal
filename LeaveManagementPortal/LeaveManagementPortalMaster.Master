@@ -172,12 +172,75 @@
             left: 15px;
             right: 15px;
         }
+
+        /* Alternate Header Styles */
+        .main-header-alt {
+            background: #BDD7EE;
+            padding: 10px 0;
+            border-bottom: 1px solid #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 130px;
+            z-index: 1000;
+        }
+
+        .cefipra-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background-image: url('Images/cefipraLogo.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.4;
+        }
+
+        .org-text-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .main-header-alt .header-flag {
+            height: 40px;
+            margin: 0;
+        }
+
+        .main-header-alt .header-org-name {
+            font-size: 24px;
+            color: navy;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .main-header-alt .header-left-logo {
+            height: 80px;
+        }
+
+        .main-header-alt .header-right-logo {
+            height: 80px;
+            width: 130px;
+        }
+
+        .main-header-alt .me-1 {
+            margin-right: 12px !important;
+        }
+
+        .main-header-alt .col-md-3.d-flex {
+            padding-right: 15px;
+        }
     </style>
 </head>
 <body>
     <form runat="server">
         <!-- Header -->
-        <header class="main-header">
+        <%--<header class="main-header">
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <div class="col-md-2">
@@ -201,7 +264,39 @@
                     </div>
                 </div>
             </div>
+        </header>--%>
+
+        <!-- Alternate Header (Initially Commented) -->
+        
+        <header class="main-header-alt">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <img src="~/Images/dstLogo.png" alt="DST Logo" class="header-left-logo" runat="server" />
+                    </div>
+                    <div class="col-md-1 text-center">
+                        <img src="~/Images/indiaFlag.png" alt="Indian Flag" class="header-flag" runat="server" />
+                    </div>
+                    <div class="col-md-6 position-relative">
+                        <div class="cefipra-bg"></div>
+                        <div class="org-text-container">
+                            <div class="header-org-name">
+                                Indo-French Centre for the Promotion of Advanced Research (IFCPAR/CEFIPRA)
+                            </div>
+                            <div class="header-org-name">
+                                Leave Management System
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-center justify-content-end">
+                        <img src="~/Images/franceFlag.png" alt="French Flag" class="header-flag" runat="server" />
+                        <div style="width: 20px;"></div>
+                        <img src="~/Images/meaeLogo.png" alt="MEAE Logo" class="header-right-logo" runat="server" />
+                    </div>
+                </div>
+            </div>
         </header>
+        
 
         <!-- Sidebar -->
         <div class="sidebar">
