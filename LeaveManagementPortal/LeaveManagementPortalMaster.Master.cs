@@ -77,7 +77,7 @@ namespace LeaveManagementPortal
             string currentUrl = Request.Url.AbsolutePath.ToLower();
 
             // Remove active class from all links
-            foreach (Control panel in new Control[] { EmployeeMenu, AdminMenu})
+            foreach (Control panel in new Control[] { EmployeeMenu, AdminMenu })
             {
                 if (panel is Panel)
                 {
@@ -92,7 +92,7 @@ namespace LeaveManagementPortal
             }
 
             // Find and mark the active link
-            foreach (Control panel in new Control[] { EmployeeMenu, AdminMenu})
+            foreach (Control panel in new Control[] { EmployeeMenu, AdminMenu })
             {
                 if (panel is Panel)
                 {

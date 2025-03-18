@@ -29,50 +29,61 @@ namespace LeaveManagementPortal
             lblDebugHidden.Text = "Hidden field value: " + hdnPendingActions.Value;
         }
 
-        protected void btnTestApprove_Click(object sender, EventArgs e)
-        {
-            string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                // Modified SQL to handle multiple leave IDs using IN clause
-                using (SqlCommand cmd = new SqlCommand(@"
-            UPDATE LeaveApplications 
-            SET ManagerApprovalStatus = 'Approved',
-                LastModifiedDate = GETDATE()
-            WHERE LeaveID IN (1, 2, 3)", conn))
-                {
-                    try
-                    {
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        System.Diagnostics.Debug.WriteLine($"Rows affected: {rowsAffected}");
+        //protected void btnTestApprove_Click(object sender, EventArgs e)
+        //{
+        //    string connectionString = Config  urationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
+        //    using (SqlConnection conn = new SqlConnection(connectionString))
+        //    {
+        //        conn.Open();
+        //        // Modified SQL to handle multiple leave IDs using IN clause
+        //        using (SqlCommand cmd = new SqlCommand(@"
+        //    UPDATE LeaveApplications 
+        //    SET ManagerApprovalStatus = 'Approved',
+        //        LastModifiedDate = GETDATE()
+        //    WHERE LeaveID IN (1, 2, 3)", conn))
+        //        {
+        //            try
+        //            {
+        //                int rowsAffected = cmd.ExecuteNonQuery();
+        //                System.Diagnostics.Debug.WriteLine($"Rows affected: {rowsAffected}");
 
-                        LoadPendingLeaves();
+        //                LoadPendingLeaves();
 
-                        // Updated message to reflect multiple leaves
-                        ScriptManager.RegisterStartupScript(this, GetType(), "UpdateSuccess",
-                            "alert('Leave IDs 1, 2, and 3 have been approved successfully.');", true);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Error updating leaves: {ex.Message}");
-                        ScriptManager.RegisterStartupScript(this, GetType(), "UpdateError",
-                            "alert('Error updating leave statuses.');", true);
-                    }
-                }
-            }
-        }
+        //                // Updated message to reflect multiple leaves
+        //                ScriptManager.RegisterStartupScript(this, GetType(), "UpdateSuccess",
+        //                    "alert('Leave IDs 1, 2, and 3 have been approved successfully.');", true);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                System.Diagnostics.Debug.WriteLine($"Error updating leaves: {ex.Message}");
+        //                ScriptManager.RegisterStartupScript(this, GetType(), "UpdateError",
+        //                    "alert('Error updating leave statuses.');", true);
+        //            }
+        //        }
+        //    }
+        //}
+        /// <summary>
+        /// below is the code for search functionality. I think its causing problems.
+        /// </summary>
+        //protected void btnSearch_Click(object sender, EventArgs e)
+        //{
+        //    LoadPendingLeaves(txtSearch.Value.Trim());
+        //}
 
-        protected void btnSearch_Click(object sender, EventArgs e)
-        {
-            LoadPendingLeaves(txtSearch.Value.Trim());
-        }
+        private int PageSize = 10; // Number of items per page
+        private int CurrentPage = 1;
 
-        protected void btnClearSearch_Click(object sender, EventArgs e)
-        {
-            txtSearch.Value = "";
-            LoadPendingLeaves();
-        }
+        //protected void btnClearSearch_Click(object sender, EventArgs e)
+        //{
+        //    txtSearch.Value = "";
+        //    LoadPendingLeaves();
+        //}
+
+        //protected void PageLink_Command(object sender, CommandEventArgs e)
+        //{
+        //    CurrentPage = Convert.ToInt32(e.CommandArgument);
+        //    LoadPendingLeaves(txtSearch.Value.Trim());
+        //}
 
         private void LoadPendingLeaves(string searchTerm = "")
         {
@@ -116,15 +127,20 @@ namespace LeaveManagementPortal
                 // 3. Manager approval is still Pending
                 // 4. Director hasn't already approved/rejected it
 
-                // Add search condition if search term exists
-                if (!string.IsNullOrWhiteSpace(searchTerm))
-                {
-                    query += @" AND (
-                        u.Name LIKE @SearchTerm 
-                        OR lt.LeaveTypeName LIKE @SearchTerm
-                        OR lt.LeaveTypeID LIKE @SearchTerm
-                    )";
-                }
+                //// Enhanced search condition that looks at more fields and supports partial matches
+                //if (!string.IsNullOrWhiteSpace(searchTerm))
+                //{
+                //    query += @" AND (
+                //        u.Name LIKE @SearchTerm 
+                //        OR u.EmployeeOfficeID LIKE @SearchTerm
+                //        OR lt.LeaveTypeName LIKE @SearchTerm
+                //        OR lt.LeaveTypeID LIKE @SearchTerm
+                //        OR la.Reason LIKE @SearchTerm
+                //        OR la.Status LIKE @SearchTerm
+                //        OR CONVERT(VARCHAR, la.StartDate, 106) LIKE @SearchTerm
+                //        OR CONVERT(VARCHAR, la.EndDate, 106) LIKE @SearchTerm
+                //    )";
+                //}
 
                 if (userRole == "Manager")
                 {

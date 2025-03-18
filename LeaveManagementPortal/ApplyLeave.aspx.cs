@@ -24,22 +24,27 @@ namespace LeaveManagementPortal
 
                 CacheExistingLeaves();
 
+                GenerateLeaveCalendar();
+
                 // Set minimum date for calendar
                 txtStartDate.Attributes["min"] = DateTime.Today.ToString("yyyy-MM-dd");
                 txtEndDate.Attributes["min"] = DateTime.Today.ToString("yyyy-MM-dd");
             }
         }
 
-        private List<LeaveDate> CachedLeaves
+        private List<LeaveInfo> CachedLeaves
         {
-            get { return ViewState["CachedLeaves"] as List<LeaveDate> ?? new List<LeaveDate>(); }
+            get { return ViewState["CachedLeaves"] as List<LeaveInfo> ?? new List<LeaveInfo>(); }
             set { ViewState["CachedLeaves"] = value; }
         }
 
-        // Class to store leave dates
+        // Class to store leave information
         [Serializable]
-        private class LeaveDate
+        private class LeaveInfo
         {
+            public int LeaveID { get; set; }
+            public string LeaveType { get; set; }
+            public string Status { get; set; }
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
         }
@@ -48,39 +53,188 @@ namespace LeaveManagementPortal
         {
             string userId = Session["UserID"]?.ToString();
             string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
-
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand(@"
-            SELECT StartDate, EndDate
-            FROM LeaveApplications
-            WHERE UserID = @UserID 
-            AND Status IN ('Approved', 'Pending')
-            AND EndDate >= @CurrentDate", conn))
+                    SELECT 
+                        la.LeaveID,
+                        lt.LeaveTypeName,
+                        la.StartDate,
+                        la.EndDate,
+                        la.Status
+                    FROM LeaveApplications la
+                    INNER JOIN LeaveTypes lt ON la.LeaveTypeID = lt.LeaveTypeID
+                    WHERE la.UserID = @UserID 
+                    AND la.Status IN ('Approved', 'Pending')
+                    ORDER BY la.StartDate", conn))
                 {
                     cmd.Parameters.AddWithValue("@UserID", userId);
-                    cmd.Parameters.AddWithValue("@CurrentDate", DateTime.Today);
-
-                    var leaveList = new List<LeaveDate>();
-
+                    var leaveList = new List<LeaveInfo>();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            leaveList.Add(new LeaveDate
+                            leaveList.Add(new LeaveInfo
                             {
+                                LeaveID = Convert.ToInt32(reader["LeaveID"]),
+                                LeaveType = reader["LeaveTypeName"].ToString(),
                                 StartDate = Convert.ToDateTime(reader["StartDate"]),
-                                EndDate = Convert.ToDateTime(reader["EndDate"])
+                                EndDate = Convert.ToDateTime(reader["EndDate"]),
+                                Status = reader["Status"].ToString()
                             });
                         }
                     }
-
                     // Store in ViewState
                     CachedLeaves = leaveList;
-
-                    System.Diagnostics.Debug.WriteLine($"Cached {leaveList.Count} future leaves");
+                    System.Diagnostics.Debug.WriteLine($"Cached {leaveList.Count} leaves");
                 }
+            }
+        }
+
+        private void GenerateLeaveCalendar()
+        {
+            // Get the current year
+            int year = DateTime.Now.Year;
+
+            // Get leave data
+            List<LeaveInfo> leaveData = CachedLeaves;
+
+            // Create a dictionary to store leave information by date
+            Dictionary<DateTime, List<LeaveInfo>> leaveDates = new Dictionary<DateTime, List<LeaveInfo>>();
+
+            // Process leave data
+            foreach (LeaveInfo leave in leaveData)
+            {
+                DateTime startDate = leave.StartDate;
+                DateTime endDate = leave.EndDate;
+
+                // Loop through all days in the leave period
+                for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+                {
+                    if (!leaveDates.ContainsKey(date))
+                    {
+                        leaveDates[date] = new List<LeaveInfo>();
+                    }
+
+                    leaveDates[date].Add(leave);
+                }
+            }
+
+            // Generate HTML for the calendar
+            StringBuilder calendarHtml = new StringBuilder();
+
+            // Generate a calendar for each month
+            for (int month = 1; month <= 12; month++)
+            {
+                calendarHtml.Append(GenerateMonthCalendar(year, month, leaveDates));
+            }
+
+            // Set the HTML
+            yearCalendar.InnerHtml = calendarHtml.ToString();
+        }
+
+        private string GenerateMonthCalendar(int year, int month, Dictionary<DateTime, List<LeaveInfo>> leaveDates)
+        {
+            StringBuilder html = new StringBuilder();
+
+            // Start month container
+            html.Append("<div class='month-calendar'>");
+
+            // Month header
+            html.AppendFormat("<div class='month-header'>{0}</div>", new DateTime(year, month, 1).ToString("MMMM"));
+
+            // Day headers
+            html.Append("<div class='month-days'>");
+            string[] dayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+            foreach (string dayName in dayNames)
+            {
+                html.AppendFormat("<div class='day-header'>{0}</div>", dayName);
+            }
+
+            // Calculate first day of the month
+            DateTime firstDay = new DateTime(year, month, 1);
+
+            // Get the day of week for the first day (0 = Sunday, 6 = Saturday)
+            int firstDayOfWeek = (int)firstDay.DayOfWeek;
+
+            // Get the number of days in the month
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+
+            // Calculate previous month days to display
+            DateTime prevMonth = firstDay.AddMonths(-1);
+            int daysInPrevMonth = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
+
+            // Generate calendar days
+            int currentDay = 1;
+            int nextMonthDay = 1;
+
+            // Total cells needed (max 6 weeks × 7 days)
+            for (int i = 0; i < 42; i++)
+            {
+                // Determine if it's a weekend
+                bool isWeekend = i % 7 == 0 || i % 7 == 6; // Sunday or Saturday
+                string weekendClass = isWeekend ? "weekend" : "";
+
+                if (i < firstDayOfWeek)
+                {
+                    // Previous month
+                    int prevMonthDay = daysInPrevMonth - firstDayOfWeek + i + 1;
+                    html.AppendFormat("<div class='calendar-day {0} other-month'>{1}</div>", weekendClass, prevMonthDay);
+                }
+                else if (currentDay <= daysInMonth)
+                {
+                    // Current month
+                    DateTime currentDate = new DateTime(year, month, currentDay);
+                    string leaveClass = "";
+                    string tooltipHtml = "";
+
+                    if (leaveDates.ContainsKey(currentDate))
+                    {
+                        List<LeaveInfo> leaves = leaveDates[currentDate];
+                        LeaveInfo leave = leaves[0]; // Just show the first leave if multiple exist
+
+                        string leaveColor = GetLeaveTypeClass(leave.LeaveType);
+                        string statusClass = leave.Status == "Pending" ? "pending-color" : leaveColor;
+
+                        leaveClass = "leave-day " + statusClass;
+                        tooltipHtml = $"<span class='leave-day-tooltip'>{leave.LeaveType} ({leave.Status})<br>{leave.StartDate.ToShortDateString()} - {leave.EndDate.ToShortDateString()}</span>";
+                    }
+
+                    html.AppendFormat("<div class='calendar-day {0} {1}'>{2}{3}</div>",
+                        weekendClass, leaveClass, currentDay, tooltipHtml);
+                    currentDay++;
+                }
+                else
+                {
+                    // Next month
+                    html.AppendFormat("<div class='calendar-day {0} other-month'>{1}</div>", weekendClass, nextMonthDay);
+                    nextMonthDay++;
+                }
+
+                // End after displaying all days of the current month and completing the row
+                if (currentDay > daysInMonth && i % 7 == 6)
+                {
+                    break;
+                }
+            }
+
+            html.Append("</div>"); // Close month-days
+            html.Append("</div>"); // Close month-calendar
+
+            return html.ToString();
+        }
+
+        private string GetLeaveTypeClass(string leaveType)
+        {
+            switch (leaveType)
+            {
+                case "CL": return "cl-color";
+                case "EL": return "el-color";
+                case "ML": return "ml-color";
+                case "RL": return "rl-color";
+                case "LOP": return "lop-color";
+                default: return "";
             }
         }
 
@@ -173,7 +327,7 @@ namespace LeaveManagementPortal
                                 leaveTypeId);
                             }
 
-                                if (availableBalance <= 0 && leaveTypeId != "5") // Allow LOP even with 0 balance
+                            if (availableBalance <= 0 && leaveTypeId != "5") // Allow LOP even with 0 balance
                             {
                                 item.Enabled = false;
                             }
@@ -224,7 +378,7 @@ namespace LeaveManagementPortal
             if (ddlLeaveType.SelectedValue == "4" && !string.IsNullOrEmpty(txtStartDate.Text))
             {
                 DateTime startDate = DateTime.Parse(txtStartDate.Text);
-                
+
                 if (!IsRestrictedHoliday(startDate))
                 {
                     lblError.Text = $"{startDate.ToString("dd-MMMM-yyyy")} is not a restricted holiday.";
@@ -239,16 +393,14 @@ namespace LeaveManagementPortal
 
         protected void txtStartDate_TextChanged(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("inside txtStartDate_TextChanged");
             if (string.IsNullOrEmpty(txtStartDate.Text)) return;
 
+            ValidateDateRange();
             // Validate restricted holiday date if applicable
             if (ddlLeaveType.SelectedValue == "4")
             {
                 ValidateRestrictedHolidayDate();
-            }
-            else
-            {
-                ValidateDateRange();
             }
 
             // If end date is empty or it's a restricted leave, set it to start date
@@ -260,6 +412,7 @@ namespace LeaveManagementPortal
 
         protected void txtEndDate_TextChanged(object sender, EventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("inside txtEndDate_TextChanged");
             ValidateDateRange();
         }
 
@@ -271,19 +424,19 @@ namespace LeaveManagementPortal
             DateTime startDate = DateTime.Parse(txtStartDate.Text);
             DateTime endDate = DateTime.Parse(txtEndDate.Text);
 
-            // Validate dates are in same year
-            if (startDate.Year != endDate.Year)
-            {
-                lblError.Text = "Leave dates must be within the same year.";
-                txtEndDate.Text = "";
-                return;
-            }
-
             // Check for leave overlap
             if (!ValidateLeaveOverlap(startDate, endDate))
             {
                 lblError.Text = "Selected dates overlap with an existing leave application.";
                 txtStartDate.Text = "";
+                txtEndDate.Text = "";
+                return;
+            }
+
+            // Validate dates are in same year
+            if (startDate.Year != endDate.Year)
+            {
+                lblError.Text = "Leave dates must be within the same year.";
                 txtEndDate.Text = "";
                 return;
             }
@@ -347,7 +500,7 @@ namespace LeaveManagementPortal
                 args.IsValid = false;
             }
         }
-            
+
         protected void btnApplyLeave_Click(object sender, EventArgs e)
         {
             if (!Page.IsValid) return;
@@ -554,7 +707,7 @@ namespace LeaveManagementPortal
                 }
             }
         }
-        
+
         private bool HasSufficientBalance(string userId, string leaveTypeId, decimal duration)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;

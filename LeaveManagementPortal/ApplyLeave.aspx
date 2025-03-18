@@ -6,11 +6,33 @@
         .form-container {
             max-width: 800px;
             margin-top: 150px;
+            margin-bottom: 100px;
             padding: 2rem;
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
+        .btn-submit {
+            background-color: #1a237e;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #151c5e;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
         .page-title {
             color: #1a237e;
             font-size: 2rem;
@@ -62,6 +84,125 @@
         .date-field-container {
             position: relative;
         }
+        .calendar-container {
+            margin-bottom: 25px;
+            font-family: Arial, sans-serif;
+        }
+    
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            gap: 15px;
+        }
+    
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+    
+        .legend-color {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+        }
+    
+        .cl-color { background-color: #4CAF50; }
+        .el-color { background-color: #2196F3; }
+        .ml-color { background-color: #FF9800; }
+        .rl-color { background-color: #9C27B0; }
+        .lop-color { background-color: #F44336; }
+        .pending-color { 
+            background: repeating-linear-gradient(
+                45deg,
+                #ccc,
+                #ccc 5px,
+                #eee 5px,
+                #eee 10px
+            );
+        }
+    
+        .year-calendar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+    
+        .month-calendar {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    
+        .month-header {
+            background-color: #f0f0f0;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+    
+        .month-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+    
+        .day-header {
+            text-align: center;
+            padding: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+    
+        .calendar-day {
+            height: 22px;
+            font-size: 11px;
+            text-align: center;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+    
+        .weekend {
+            background-color: #f9f9f9;
+        }
+    
+        .other-month {
+            color: #ccc;
+        }
+    
+        .leave-day {
+            cursor: default;
+            position: relative;
+        }
+    
+        .leave-day-tooltip {
+            visibility: hidden;
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 10px;
+            width: 120px;
+        }
+    
+        .leave-day:hover .leave-day-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
             
     </style>
 </asp:Content>
@@ -70,6 +211,19 @@
     <div class="container">
         <div class="form-container">
             <h2 class="page-title">Apply Leave</h2>
+
+            <div class="calendar-container">
+                <h3>Your Leave Calendar</h3>
+                <div class="calendar-legend">
+                    <div class="legend-item"><span class="legend-color cl-color"></span> CL - Casual Leave</div>
+                    <div class="legend-item"><span class="legend-color el-color"></span> EL - Earned Leave</div>
+                    <div class="legend-item"><span class="legend-color ml-color"></span> ML - Medical Leave</div>
+                    <div class="legend-item"><span class="legend-color rl-color"></span> RL - Restricted Leave</div>
+                    <div class="legend-item"><span class="legend-color lop-color"></span> LOP - Loss of Pay</div>
+                    <div class="legend-item"><span class="legend-color pending-color"></span> Pending</div>
+                </div>
+                <div id="yearCalendar" runat="server" class="year-calendar"></div>
+            </div>
 
             <%-- Manager Warning Alert --%>
             <asp:Panel ID="pnlNoManager" runat="server" CssClass="alert alert-warning" Visible="false">
@@ -156,16 +310,16 @@
             <div class="mb-4">
                 <label for="txtReason" class="form-label">Reason</label>
                 <asp:TextBox ID="txtReason" runat="server" CssClass="form-control" 
-                    TextMode="MultiLine" Rows="3" MaxLength="150" />
+                    TextMode="MultiLine" Rows="3" MaxLength="150" onkeyup="updateCharCount(this);" />
                 <div class="calendar-info">
-                    Maximum 150 characters allowed
+                    <span id="charCount">150</span> characters remaining
                 </div>
             </div>
 
             <%-- Submit Button --%>
-            <div class="d-grid">
+            <div class="form-section mb-3">
                 <asp:Button ID="btnApplyLeave" runat="server" Text="Apply Leave" 
-                    CssClass="btn btn-primary"
+                    CssClass="btn-submit"
                     OnClick="btnApplyLeave_Click" />
             </div>
 
@@ -173,4 +327,18 @@
             <asp:Label ID="lblError" runat="server" CssClass="validation-error mt-3 d-block" />
         </div>
     </div>
+
+    <script type="text/javascript">
+    function updateCharCount(textBox) {
+        var maxLength = 150;
+        var currentLength = textBox.value.length;
+        var remaining = maxLength - currentLength;
+        document.getElementById('charCount').innerHTML = remaining;
+    }
+
+    // Initialize the counter when the page loads
+    window.onload = function() {
+        updateCharCount(document.getElementById('<%= txtReason.ClientID %>'));
+    };
+</script>
 </asp:Content>

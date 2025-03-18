@@ -15,12 +15,11 @@
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="~/Content/Site.css" rel="stylesheet" />
-    
+
     <asp:ContentPlaceHolder ID="HeadContent" runat="server">
     </asp:ContentPlaceHolder>
 
     <style>
-
         body {
             margin: 0;
             padding: 0;
@@ -46,7 +45,8 @@
 
         .header-flags-container {
             text-align: center;
-            margin-bottom: 5px;
+            height: 50px;
+            margin-bottom: 3px;
         }
 
         .header-flag {
@@ -54,10 +54,23 @@
             margin: 0 5px;
         }
 
+        .header-logo {
+            height: 60px;
+            margin: 0 5px;
+        }
+
         .header-org-name {
             font-size: 24px;
             color: navy;
             text-align: center;
+            margin-bottom: -5px;
+        }
+
+        .header-portal-name {
+            font-size: 22px;
+            color: navy;
+            text-align: center;
+            margin-bottom: 5px;
         }
 
         .header-right-logo {
@@ -82,7 +95,9 @@
             left: 0;
             top: 128px; /* Header height */
             bottom: 80px; /* Footer height */
-            overflow-y: auto;
+            display: flex; /* new addition */
+            flex-direction: column; /* new addition */
+            /*overflow-y: auto;*/
         }
 
         .sidebar .nav-link {
@@ -99,6 +114,57 @@
         .sidebar .nav-link.active {
             background-color: #1a237e;
             color: white;
+        }
+
+        /* User Info Styles */
+        .user-info {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 10px;
+            background-color: #1a237e;
+            color: white;
+            flex-shrink: 0; /* Prevents shrinking */ /* new addition */
+        }
+
+        .user-name {
+            font-weight: bold;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Menu Section Styles */
+
+        .menu-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 60px; /* Space for logout button */
+        }
+
+        .menu-section {
+            margin-bottom: 15px;
+        }
+
+        .menu-section-title {
+            padding: 10px 15px;
+            font-weight: 600;
+            color: #1a237e;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Logout Button Style */
+        .logout-btn {
+            position: absolute;
+            background-color: #f8f9fa;
+            bottom: 20px;
+            left: 15px;
+            right: 15px;
         }
 
         /* Main Content Styles */
@@ -129,48 +195,6 @@
 
         .footer-text {
             font-size: 14px;
-        }
-
-        /* User Info Styles */
-        .user-info {
-            padding: 15px;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 10px;
-            background-color: #1a237e;
-            color: white;
-        }
-
-        .user-name {
-            font-weight: bold;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-
-        .user-role {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        /* Menu Section Styles */
-        .menu-section {
-            margin-bottom: 15px;
-        }
-
-        .menu-section-title {
-            padding: 10px 15px;
-            font-weight: 600;
-            color: #1a237e;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 0.5px;
-        }
-
-        /* Logout Button Style */
-        .logout-btn {
-            position: absolute;
-            bottom: 20px;
-            left: 15px;
-            right: 15px;
         }
 
         /* Alternate Header Styles */
@@ -240,7 +264,7 @@
 <body>
     <form runat="server">
         <!-- Header -->
-        <%--<header class="main-header">
+        <header class="main-header">
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <div class="col-md-2">
@@ -249,13 +273,13 @@
                     <div class="col-md-8">
                         <div class="header-flags-container">
                             <img src="~/Images/indiaFlag.png" alt="Flag 1" class="header-flag" runat="server" />
-                            <img src="~/Images/cefipraLogo.png" alt="Flag 2" class="header-flag" runat="server" />
+                            <img src="~/Images/cefipraLogo.png" alt="Flag 2" class="header-logo" runat="server" />
                             <img src="~/Images/franceFlag.png" alt="Flag 3" class="header-flag" runat="server" />
                         </div>
                         <div class="header-org-name">
                             Indo-French Centre for the Promotion of Advanced Research (IFCPAR/CEFIPRA)
                         </div>
-                        <div class="header-org-name">
+                        <div class="header-portal-name">
                             Leave Management System
                         </div>
                     </div>
@@ -264,11 +288,11 @@
                     </div>
                 </div>
             </div>
-        </header>--%>
+        </header>
 
         <!-- Alternate Header (Initially Commented) -->
-        
-        <header class="main-header-alt">
+
+        <%--<header class="main-header-alt">
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <div class="col-md-2">
@@ -295,8 +319,8 @@
                     </div>
                 </div>
             </div>
-        </header>
-        
+        </header>--%>
+
 
         <!-- Sidebar -->
         <div class="sidebar">
@@ -310,46 +334,61 @@
                 </div>
             </div>
 
-            <!-- Employee Menu Section -->
-            <asp:Panel ID="EmployeeMenu" runat="server" CssClass="menu-section">
-                <div class="menu-section-title">Employee Menu</div>
-                <div class="nav flex-column">
-                    <asp:HyperLink ID="lnkDashboard" runat="server" NavigateUrl="~/Dashboard.aspx" CssClass="nav-link">
-                        <i class="fas fa-home me-2"></i>Dashboard
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/ApplyLeave.aspx" CssClass="nav-link">
-                        <i class="fas fa-calendar-plus me-2"></i>Apply Leave
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/EmployeeLeaveHistory.aspx" CssClass="nav-link">
-                        <i class="fas fa-history me-2"></i>Leave History
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/Profile.aspx" CssClass="nav-link">
-                        <i class="fas fa-user-cog me-2"></i>Profile Settings
-                    </asp:HyperLink>
-                </div>
-            </asp:Panel>
+            <div class="menu-container">
+                <!-- Employee Menu Section -->
+                <asp:Panel ID="EmployeeMenu" runat="server" CssClass="menu-section">
+                    <div class="menu-section-title">Employee Menu</div>
+                    <div class="nav flex-column">
+                        <asp:HyperLink ID="lnkDashboard" runat="server" NavigateUrl="~/Dashboard.aspx" CssClass="nav-link">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/ApplyLeave.aspx" CssClass="nav-link">
+                            <i class="fas fa-calendar-plus me-2"></i>Apply Leave
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/EmployeeLeaveHistory.aspx" CssClass="nav-link">
+                            <i class="fas fa-history me-2"></i>Leave History
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/Profile.aspx" CssClass="nav-link">
+                            <i class="fas fa-user-cog me-2"></i>Profile Settings
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/AddInventory.aspx" CssClass="nav-link">
+                            <i class="fas fa-user-cog me-2"></i>Add Inventory
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/SearchInventory.aspx" CssClass="nav-link">
+                            <i class="fas fa-user-cog me-2"></i>Search Inventory
+                        </asp:HyperLink>
+                    </div>
+                </asp:Panel>
 
-            <!-- Admin Menu Section -->
-            <asp:Panel ID="AdminMenu" runat="server" CssClass="menu-section" Visible="false">
-                <div class="menu-section-title">Admin Menu</div>
-                <div class="nav flex-column">
-                    <asp:HyperLink runat="server" NavigateUrl="~/PendingLeaveApprovals.aspx" CssClass="nav-link">
+
+                <!-- Admin Menu Section -->
+                <asp:Panel ID="AdminMenu" runat="server" CssClass="menu-section" Visible="false">
+                    <div class="menu-section-title">Admin Menu</div>
+                    <div class="nav flex-column">
+                        <asp:HyperLink runat="server" NavigateUrl="~/PendingLeaveApprovals.aspx" CssClass="nav-link">
                         <i class="fas fa-check-square me-2"></i>Pending Approval
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/StaffLeaveHistory.aspx" CssClass="nav-link">
+                            </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/LeaveQuota.aspx" CssClass="nav-link">
+                        <i class="fas fa-check-square me-2"></i>Leave Quota
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/StaffLeaveHistory.aspx" CssClass="nav-link">
                         <i class="fas fa-history me-2"></i>Staff Leave History
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/AddEmployee.aspx" CssClass="nav-link">
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/AddEmployee.aspx" CssClass="nav-link">
                         <i class="fas fa-user-plus me-2"></i>Add Employee
-                    </asp:HyperLink>
-                    <asp:HyperLink runat="server" NavigateUrl="~/ManageEmployees.aspx" CssClass="nav-link">
+                        </asp:HyperLink>
+                        <asp:HyperLink runat="server" NavigateUrl="~/ManageEmployees.aspx" CssClass="nav-link">
                         <i class="fas fa-users-cog me-2"></i>Manage Employees
                     </asp:HyperLink>
-                </div>
-            </asp:Panel>
+                        <asp:HyperLink runat="server" NavigateUrl="~/Settings.aspx" CssClass="nav-link">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </asp:HyperLink>
+                    </div>
+                </asp:Panel>
+            </div>
 
             <!-- Logout Button -->
-            <asp:LinkButton ID="btnLogout" runat="server" 
+            <asp:LinkButton ID="btnLogout" runat="server"
                 CssClass="btn btn-outline-primary logout-btn"
                 OnClick="btnLogout_Click"
                 CausesValidation="false">

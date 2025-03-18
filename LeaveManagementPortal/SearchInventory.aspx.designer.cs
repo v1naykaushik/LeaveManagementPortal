@@ -11,61 +11,52 @@ namespace LeaveManagementPortal
 {
 
 
-    public partial class PendingLeaveApprovals
+    public partial class SearchInventory
     {
 
         /// <summary>
-        /// UpdatePanel1 control.
+        /// txtSearchName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+        protected global::System.Web.UI.WebControls.TextBox txtSearchName;
 
         /// <summary>
-        /// rptLeaveRequests control.
+        /// ddlSearchCategory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater rptLeaveRequests;
+        protected global::System.Web.UI.WebControls.DropDownList ddlSearchCategory;
 
         /// <summary>
-        /// pnlNoLeaves control.
+        /// ddlStockStatus control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlNoLeaves;
+        protected global::System.Web.UI.WebControls.DropDownList ddlStockStatus;
 
         /// <summary>
-        /// btnSaveChanges control.
+        /// btnSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSaveChanges;
+        protected global::System.Web.UI.WebControls.Button btnSearch;
 
         /// <summary>
-        /// hdnPendingActions control.
+        /// gvInventory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hdnPendingActions;
-
-        /// <summary>
-        /// lblDebugHidden control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblDebugHidden;
+        protected global::System.Web.UI.WebControls.GridView gvInventory;
     }
 }

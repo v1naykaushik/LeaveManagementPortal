@@ -11,61 +11,79 @@ namespace LeaveManagementPortal
 {
 
 
-    public partial class PendingLeaveApprovals
+    public partial class Settings
     {
 
         /// <summary>
-        /// UpdatePanel1 control.
+        /// txtHolidayDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+        protected global::System.Web.UI.WebControls.TextBox txtHolidayDate;
 
         /// <summary>
-        /// rptLeaveRequests control.
+        /// rfvDate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater rptLeaveRequests;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvDate;
 
         /// <summary>
-        /// pnlNoLeaves control.
+        /// txtHolidayName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlNoLeaves;
+        protected global::System.Web.UI.WebControls.TextBox txtHolidayName;
 
         /// <summary>
-        /// btnSaveChanges control.
+        /// rfvName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnSaveChanges;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvName;
 
         /// <summary>
-        /// hdnPendingActions control.
+        /// rblHolidayType control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hdnPendingActions;
+        protected global::System.Web.UI.WebControls.RadioButtonList rblHolidayType;
 
         /// <summary>
-        /// lblDebugHidden control.
+        /// btnAddHoliday control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblDebugHidden;
+        protected global::System.Web.UI.WebControls.Button btnAddHoliday;
+
+        /// <summary>
+        /// upHolidays control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel upHolidays;
+
+        /// <summary>
+        /// rptYears control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptYears;
     }
 }

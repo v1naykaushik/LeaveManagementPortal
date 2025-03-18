@@ -225,7 +225,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             var dateField = document.getElementById('<%= txtDateRange.ClientID %>');
             if (dateField) {
-                dateField.addEventListener('click', function() {
+                dateField.addEventListener('click', function () {
                     this.showPicker();
                 });
             }

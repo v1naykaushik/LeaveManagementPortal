@@ -274,9 +274,15 @@
     <Content Include="Account\TwoFactorAuthenticationSignIn.aspx" />
     <Content Include="Account\VerifyPhoneNumber.aspx" />
     <Content Include="AddEmployee.aspx" />
+    <Content Include="AddInventory.aspx" />
     <Content Include="AdminDashboard.aspx" />
     <Content Include="Images\cefipraLogo.png" />
+    <Content Include="Images\no-image.png" />
+    <Content Include="ItemAllotment.aspx" />
+    <Content Include="LeaveQuota.aspx" />
     <Content Include="ManageEmployees.aspx" />
+    <Content Include="SearchInventory.aspx" />
+    <Content Include="Settings.aspx" />
     <Content Include="StaffLeaveHistory.aspx" />
     <Content Include="ApplyLeave.aspx" />
     <Content Include="Contact.aspx" />
@@ -369,6 +375,16 @@
     <Content Include="Scripts\WebForms\WebParts.js" />
     <Content Include="Scripts\WebForms\WebUIValidation.js" />
     <Content Include="Site.Master" />
+    <Content Include="Uploads\Inventory\1bf383f3-94e8-43a7-9f2e-eebe281871ea.jpg" />
+    <Content Include="Uploads\Inventory\20250227172547_e1722fda-6808-42cd-a65a-f1a43ebad4d7.png" />
+    <Content Include="Uploads\Inventory\20250227173954_aa724574-e5c1-47ce-adbc-d413e1650cd2.jpg" />
+    <Content Include="Uploads\Inventory\20250227174830_c1d6edef-54af-43d8-9485-3aa14b99e6a3.png" />
+    <Content Include="Uploads\Inventory\20250228104157_1c6a2de5-728d-4f2a-98f8-25108b5363d1.jpg" />
+    <Content Include="Uploads\Inventory\20250228104638_35ed4de3-e504-43f4-9e51-c09026789595.jpg" />
+    <Content Include="Uploads\Inventory\20250306141432_68befdb9-e9ed-4c46-b684-1ef50a68bb4f.png" />
+    <Content Include="Uploads\Inventory\20250310153758_fbc6f02b-40d4-46d6-8ac4-1c6a2ef60c26.png" />
+    <Content Include="Uploads\Inventory\5e627ed8-06be-4c9c-a05c-b4bd0329fb18.jpg" />
+    <Content Include="Uploads\Inventory\d248b099-ab71-4abe-8443-0c06924cb1a3.png" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
@@ -487,6 +503,13 @@
     <Compile Include="AddEmployee.aspx.designer.cs">
       <DependentUpon>AddEmployee.aspx</DependentUpon>
     </Compile>
+    <Compile Include="AddInventory.aspx.cs">
+      <DependentUpon>AddInventory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AddInventory.aspx.designer.cs">
+      <DependentUpon>AddInventory.aspx</DependentUpon>
+    </Compile>
     <Compile Include="AdminDashboard.aspx.cs">
       <DependentUpon>AdminDashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -494,12 +517,40 @@
     <Compile Include="AdminDashboard.aspx.designer.cs">
       <DependentUpon>AdminDashboard.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ItemAllotment.aspx.cs">
+      <DependentUpon>ItemAllotment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ItemAllotment.aspx.designer.cs">
+      <DependentUpon>ItemAllotment.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="LeaveQuota.aspx.cs">
+      <DependentUpon>LeaveQuota.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LeaveQuota.aspx.designer.cs">
+      <DependentUpon>LeaveQuota.aspx</DependentUpon>
+    </Compile>
     <Compile Include="ManageEmployees.aspx.cs">
       <DependentUpon>ManageEmployees.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="ManageEmployees.aspx.designer.cs">
       <DependentUpon>ManageEmployees.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="SearchInventory.aspx.cs">
+      <DependentUpon>SearchInventory.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SearchInventory.aspx.designer.cs">
+      <DependentUpon>SearchInventory.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.aspx.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Settings.aspx.designer.cs">
+      <DependentUpon>Settings.aspx</DependentUpon>
     </Compile>
     <Compile Include="StaffLeaveHistory.aspx.cs">
       <DependentUpon>StaffLeaveHistory.aspx</DependentUpon>

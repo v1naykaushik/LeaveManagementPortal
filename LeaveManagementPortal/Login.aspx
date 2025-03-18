@@ -9,11 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     
     <style>
-        /* Header Styles */
+        /* Header Styles  #BDD7EE*/
         .main-header {
             background: #BDD7EE;
             padding: 10px 0;
             border-bottom: 1px solid #ccc;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 130px;
+            z-index: 1000;
         }
 
         .header-left-logo {
@@ -22,13 +28,20 @@
 
         .header-flags-container {
             text-align: center;
-            margin-bottom: 5px;
+            height: 50px;
+            margin-bottom: 3px;
         }
 
         .header-flag {
             height: 30px;
             margin: 0 5px;
         }
+
+        .header-logo {
+            height: 60px;
+            margin: 0 5px;
+        }
+
         .header-cefipralogo {
             height: 40px;
             margin: 0 5px;
@@ -38,6 +51,14 @@
             font-size: 24px;
             color: navy;
             text-align: center;
+            margin-bottom: -5px;
+        }
+
+        .header-portal-name {
+            font-size: 22px;
+            color: navy;
+            text-align: center;
+            margin-bottom: 5px;
         }
 
         .header-right-logo {
@@ -138,7 +159,7 @@
 
         /* Main content area */
         .main-content {
-            min-height: calc(100vh - 180px); /* Adjust based on header/footer height */
+            min-height: calc(130vh - 180px); /* Adjust based on header/footer height */
             display: flex;
             align-items: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -152,23 +173,23 @@
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <div class="col-md-2">
-                        <img src="Images/dstLogo.png" alt="Organization Logo" class="header-left-logo" />
+                        <img src="~/Images/dstLogo.png" alt="Organization Logo" class="header-left-logo" runat="server" />
                     </div>
                     <div class="col-md-8">
                         <div class="header-flags-container">
-                            <img src="Images/indiaFlag.png" alt="Flag 1" class="header-flag" />
-                            <img src="Images/cefipraLogo.png" alt="Flag 2" class="header-cefipralogo" />
-                            <img src="Images/franceFlag.png" alt="Flag 3" class="header-flag" />
+                            <img src="~/Images/indiaFlag.png" alt="Flag 1" class="header-flag" runat="server" />
+                            <img src="~/Images/cefipraLogo.png" alt="Flag 2" class="header-logo" runat="server" />
+                            <img src="~/Images/franceFlag.png" alt="Flag 3" class="header-flag" runat="server" />
                         </div>
                         <div class="header-org-name">
                             Indo-French Centre for the Promotion of Advanced Research (IFCPAR/CEFIPRA)
                         </div>
-                        <div class="header-org-name">
+                        <div class="header-portal-name">
                             Leave Management System
                         </div>
                     </div>
                     <div class="col-md-2 text-end">
-                        <img src="Images/meaeLogo.png" alt="Right Logo" class="header-right-logo" />
+                        <img src="~/Images/meaeLogo.png" alt="Right Logo" class="header-right-logo" runat="server" />
                     </div>
                 </div>
             </div>
@@ -245,7 +266,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Handle browser autofill
             if (navigator.userAgent.indexOf("Chrome") !== -1) {
                 setTimeout(function () {
@@ -261,7 +282,7 @@
                 e.preventDefault();
                 var passwordField = $("#<%= txtPassword.ClientID %>");
                 var toggleIcon = $("#toggleIcon");
-            
+
                 if (passwordField.attr("type") === "password") {
                     passwordField.attr("type", "text");
                     toggleIcon.removeClass("fa-eye").addClass("fa-eye-slash");

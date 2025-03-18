@@ -163,13 +163,13 @@
             border-top: 1px solid rgba(255,255,255,0.1); /* Subtle top border */
         }
 
-        .search-container .input-group {
+        /*.search-container .input-group {
             min-width: 300px;
         }
 
         .search-container .btn {
             min-width: 70px;
-        }
+        }*/
 
         .selection-count {
             color: white;
@@ -223,7 +223,7 @@
         }
 
         /* Modal Styles */
-        .detail-card {
+        /*.detail-card {
             position: relative;
             padding: 1rem 1.5rem;
             margin-bottom: 1rem;
@@ -254,7 +254,7 @@
             color: #2c3e50;
             font-weight: 500;
             font-size: 0.95rem;
-        }
+        }*/
 
         /*        .approval-status {
             padding: 1rem;
@@ -295,6 +295,25 @@
             border-radius: 4px;
             margin-left: 8px;
         }
+
+        /*.pagination-container {
+            margin: 20px 0;
+        }
+
+        .page-link {
+            padding: 8px 16px;
+            margin: 0 4px;
+            border-radius: 4px;
+            color: #1a237e;
+            background: white;
+            border: 1px solid #dee2e6;
+        }
+
+        .page-link.active {
+            background: #1a237e;
+            color: white;
+            border-color: #1a237e;
+        }*/
     </style>
 </asp:Content>
 
@@ -310,10 +329,10 @@
             </Triggers>
             <ContentTemplate>
                 <!-- Select All Checkbox -->
-                <div class="select-all-container">
+                <%--<div class="select-all-container">
                     <input type="checkbox" id="selectAll" class="tile-checkbox" onclick="toggleAllCheckboxes()" />
                     <label for="selectAll" class="select-all-label">Select All</label>
-                </div>
+                </div>--%>
                 <div class="batch-actions mb-3">
                     <button type="button" class="btn btn-success me-2" onclick="approveSelected()">
                         <i class="fas fa-check me-1"></i>Approve Selected
@@ -326,7 +345,7 @@
                     </button>
                 </div>
 
-                <div class="search-container">
+                <%--<div class="search-container">
                     <div class="input-group" style="width: 300px;">
                         <input type="text" ID="txtSearch" runat="server" 
                             class="form-control" placeholder="Search employee or leave type" />
@@ -337,7 +356,7 @@
                             Text="Clear" CssClass="btn btn-outline-secondary" 
                             OnClick="btnClearSearch_Click" />
                     </div>
-                </div>
+                </div>--%>
 
                 <!-- Pending Leaves Grid -->
                 <div class="row">
@@ -355,7 +374,7 @@
 
                                         <!-- Leave Info -->
                                         <div class="leave-info"
-                                            onclick="showLeaveDetails('<%# HttpUtility.JavaScriptStringEncode(Eval("EmployeeName").ToString()) %>', 
+                                            <%--onclick="showLeaveDetails('<%# HttpUtility.JavaScriptStringEncode(Eval("EmployeeName").ToString()) %>', 
                                                                       '<%# HttpUtility.JavaScriptStringEncode(Eval("LeaveTypeName").ToString()) %>', 
                                                                       '<%# Eval("StartDate", "{0:dd MMM yyyy}") %>', 
                                                                       '<%# Eval("EndDate", "{0:dd MMM yyyy}") %>', 
@@ -365,8 +384,9 @@
                                                                       <%# Eval("IsHalfDay").ToString().ToLower() %>, 
                                                                       '<%# Eval("ManagerApprovalStatus") %>', 
                                                                       '<%# Eval("DirectorApprovalStatus") %>',
-                                                                      '<%# Eval("LeaveID") %>')"
-                                            style="cursor: pointer;">
+                                                                      '<%# Eval("LeaveID") %>')"--%>
+                                            <%--style="cursor: pointer;"--%>
+                                            >
                                             <!-- Employee Info -->
                                             <div class="employee-info">
                                                 <span class="employee-name"><%# Eval("EmployeeName") %></span>
@@ -377,16 +397,22 @@
                                             <div class="leave-details">
                                                 <span class="leave-type"><%# Eval("LeaveTypeName") %></span>
                                                 <span class="leave-duration"><%# FormatDuration(Eval("Duration"), Eval("IsHalfDay")) %></span>
-                                                <span class="leave-id ms-2">Leave ID: <%# Eval("LeaveID") %></span>
+                                                <%--<span class="leave-id ms-2">Leave ID: <%# Eval("LeaveID") %></span>--%>
+                                                <span class="leave-dates">
+                                                    <%# Eval("StartDate", "{0:dd MMM yyyy}") %>
+                                                    <%# Eval("StartDate").ToString() != Eval("EndDate").ToString() ? " - " + Eval("EndDate", "{0:dd MMM yyyy}") : "" %>
+                                                </span>
                                                 <%# Session["UserRole"].ToString() == "Director" ? 
                                                     "<span class='manager-status " + (Eval("ManagerApprovalStatus").ToString() == "Approved" ? "status-approved" : "status-pending") + "'>" +
                                                     "Manager: " + Eval("ManagerApprovalStatus") + "</span>" : "" %>
                                             </div>
 
                                             <!-- Dates -->
-                                            <div class="leave-dates">
-                                                <%# Eval("StartDate", "{0:dd MMM yyyy}") %>
-                                                <%# Eval("StartDate").ToString() != Eval("EndDate").ToString() ? " - " + Eval("EndDate", "{0:dd MMM yyyy}") : "" %>
+                                            <div>
+                                                 <span class="leave-duration">Reason:</span> 
+                                                <span class="leave-dates">
+                                                    <%# string.IsNullOrEmpty(Eval("LeaveReason").ToString()) ? "No reason provided" : Eval("LeaveReason") %>
+                                                </span>
                                             </div>
                                         </div>
 
@@ -421,12 +447,12 @@
             <span class="selection-count">0 leaves selected</span>
             <asp:Button ID="btnSaveChanges" runat="server" Text="Save Changes"
                 CssClass="btn-save" OnClientClick="return setHiddenField();" OnClick="btnSaveChanges_Click" Enabled="false" />
-            <asp:Button ID="btnTestApprove" runat="server" Text="Test Approve Leave 1011"
-                OnClick="btnTestApprove_Click" CssClass="btn btn-warning" />
+            <%--<asp:Button ID="btnTestApprove" runat="server" Text="Test Approve Leave 1011"
+                OnClick="btnTestApprove_Click" CssClass="btn btn-warning" />--%>
         </div>
 
         <!-- Leave Details Modal -->
-        <div class="modal fade" id="leaveDetailsModal" tabindex="-1">
+        <%--<div class="modal fade" id="leaveDetailsModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
@@ -500,7 +526,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>--%>
     </div>
 
     <script type="text/javascript">
@@ -520,35 +546,36 @@
             });
         }
 
-        function toggleAllCheckboxes() {
-            var checkboxes = document.querySelectorAll('.tile-checkbox');
-            var selectAllChecked = document.getElementById('selectAll').checked;
+        //function toggleAllCheckboxes() {
+        //    var checkboxes = document.querySelectorAll('.tile-checkbox');
+        //    var selectAllChecked = document.getElementById('selectAll').checked;
 
-            checkboxes.forEach(function (checkbox) {
-                if (checkbox.dataset.leaveid) {
-                    checkbox.checked = selectAllChecked;
-                    if (selectAllChecked) {
-                        selectedLeaves.add(checkbox.dataset.leaveid);
-                    } else {
-                        selectedLeaves.delete(checkbox.dataset.leaveid);
-                        delete pendingActions[checkbox.dataset.leaveid];
+        //    checkboxes.forEach(function (checkbox) {
+        //        if (checkbox.dataset.leaveid) {
+        //            checkbox.checked = selectAllChecked;
+        //            if (selectAllChecked) {
+        //                selectedLeaves.add(checkbox.dataset.leaveid);
+        //            } else {
+        //                selectedLeaves.delete(checkbox.dataset.leaveid);
+        //                delete pendingActions[checkbox.dataset.leaveid];
 
-                        // Reset button states
-                        const approveBtn = document.querySelector(`button[onclick*="markForAction(${checkbox.dataset.leaveid}, 'approve')"]`);
-                        const rejectBtn = document.querySelector(`button[onclick*="markForAction(${checkbox.dataset.leaveid}, 'reject')"]`);
-                        if (approveBtn) approveBtn.classList.remove('faded');
-                        if (rejectBtn) rejectBtn.classList.remove('faded');
-                    }
-                }
-            });
+        //                // Reset button states
+        //                const approveBtn = document.querySelector(`button[onclick*="markForAction(${checkbox.dataset.leaveid}, 'approve')"]`);
+        //                const rejectBtn = document.querySelector(`button[onclick*="markForAction(${checkbox.dataset.leaveid}, 'reject')"]`);
+        //                if (approveBtn) approveBtn.classList.remove('faded');
+        //                if (rejectBtn) rejectBtn.classList.remove('faded');
+        //            }
+        //        }
+        //    });
 
-            updateSelectedCount();
-        }
+        //    updateSelectedCount();
+        //}
 
         function updateSelectedCount() {
             var hasActions = Object.keys(pendingActions).length > 0;
             var countText = selectedLeaves.size + ' leaves selected';
             document.querySelector('.selection-count').textContent = countText;
+            console.log("Selected Leaves Size:", selectedLeaves.size, selectedLeaves);
 
             // Enable/disable save button
             var saveButton = document.getElementById('<%= btnSaveChanges.ClientID %>');
@@ -644,35 +671,35 @@
             updateSelectedCount();
         }
 
-        function showLeaveDetails(employeeName, leaveType, startDate, endDate, duration, employeeId, reason, isHalfDay, managerStatus, directorStatus, leaveId) {
-            console.log("Function called with:", { employeeName, leaveType, startDate, endDate, duration, employeeId, reason, isHalfDay, managerStatus, directorStatus });
+        //function showLeaveDetails(employeeName, leaveType, startDate, endDate, duration, employeeId, reason, isHalfDay, managerStatus, directorStatus, leaveId) {
+        //    console.log("Function called with:", { employeeName, leaveType, startDate, endDate, duration, employeeId, reason, isHalfDay, managerStatus, directorStatus });
 
-            try {
-                document.getElementById('modalEmployeeName').textContent = employeeName;
-                document.getElementById('modalEmployeeId').textContent = employeeId;
-                document.getElementById('modalLeaveType').textContent = leaveType;
-                document.getElementById('modalDuration').textContent = isHalfDay ? 'Half Day' : Math.round(duration) + (duration === '1.0' ? ' day' : ' days');
-                document.getElementById('modalDates').textContent = startDate + (startDate !== endDate ? ' - ' + endDate : '');
-                document.getElementById('modalReason').textContent = reason || 'No reason provided';
-                document.getElementById('modalLeaveId').textContent = leaveId;
+        //    try {
+        //        document.getElementById('modalEmployeeName').textContent = employeeName;
+        //        document.getElementById('modalEmployeeId').textContent = employeeId;
+        //        document.getElementById('modalLeaveType').textContent = leaveType;
+        //        document.getElementById('modalDuration').textContent = isHalfDay ? 'Half Day' : Math.round(duration) + (duration === '1.0' ? ' day' : ' days');
+        //        document.getElementById('modalDates').textContent = startDate + (startDate !== endDate ? ' - ' + endDate : '');
+        //        document.getElementById('modalReason').textContent = reason || 'No reason provided';
+        //        document.getElementById('modalLeaveId').textContent = leaveId;
 
-                // Format approval status
-                let approvalStatus = 'Manager: ' + managerStatus;
-                if (managerStatus === 'Approved') {
-                    approvalStatus += ' | Director: ' + directorStatus;
-                }
-                document.getElementById('modalApprovalStatus').textContent = approvalStatus;
+        //        // Format approval status
+        //        let approvalStatus = 'Manager: ' + managerStatus;
+        //        if (managerStatus === 'Approved') {
+        //            approvalStatus += ' | Director: ' + directorStatus;
+        //        }
+        //        document.getElementById('modalApprovalStatus').textContent = approvalStatus;
 
-                // Create and show modal
-                const modalElement = document.getElementById('leaveDetailsModal');
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
+        //        // Create and show modal
+        //        const modalElement = document.getElementById('leaveDetailsModal');
+        //        const modal = new bootstrap.Modal(modalElement);
+        //        modal.show();
 
-                console.log("Modal should be visible now");
-            } catch (error) {
-                console.error("Error in showLeaveDetails:", error);
-            }
-        }
+        //        console.log("Modal should be visible now");
+        //    } catch (error) {
+        //        console.error("Error in showLeaveDetails:", error);
+        //    }
+        //}
 
         // Function to prepare data for submission
         function prepareSubmissionData() {
