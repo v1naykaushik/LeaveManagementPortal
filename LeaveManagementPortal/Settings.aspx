@@ -261,16 +261,16 @@
                                                                 CommandName="Delete" 
                                                                 CommandArgument='<%# Eval("HolidayID") %>'
                                                                 OnClientClick="return confirm('Are you sure you want to delete this holiday?');">
-                                                                <i class="fas fa-trash"></i>
+                                                                <i class="fas fa-trash"></i> Delete
                                                             </asp:LinkButton>
                                                         </div>
                                                     </ItemTemplate>
-                                                    <FooterTemplate>
+                                                    <%--<FooterTemplate>
                                                         </div>
                                                         <asp:Panel ID="pnlNoHolidays" runat="server" CssClass="text-muted text-center py-3">
                                                             No holidays added for this year
                                                         </asp:Panel>
-                                                    </FooterTemplate>
+                                                    </FooterTemplate>--%>
                                                 </asp:Repeater>
                                             </div>
                                         </div>

@@ -1,5 +1,6 @@
-﻿using DocumentFormat.OpenXml.Math;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -13,7 +14,7 @@ using static System.Data.Entity.Infrastructure.Design.Executor;
 
 namespace LeaveManagementPortal
 {
-    public partial class AdminLeaveBalances : Page
+    public partial class AdminLeaveBalances : System.Web.UI.Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -41,17 +42,33 @@ namespace LeaveManagementPortal
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT UserID, Name, EmployeeOfficeID 
-                    FROM Users 
+                    SELECT UserID, FirstName, MiddleName, LastName, EmployeeOfficeID 
+                    FROM Users
                     WHERE IsActive = 1
-                    ORDER BY Name", conn))
+                    ORDER BY USERID", conn))
                 {
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string displayText = $"{reader["Name"]} ({reader["EmployeeOfficeID"]})";
+                            List<string> nameParts = new List<string>();
+
+                            if (!string.IsNullOrEmpty(reader["FirstName"].ToString()))
+                                nameParts.Add(reader["FirstName"].ToString());
+
+                            if (!string.IsNullOrEmpty(reader["MiddleName"].ToString()))
+                                nameParts.Add(reader["MiddleName"].ToString());
+
+                            if (!string.IsNullOrEmpty(reader["LastName"].ToString()))
+                                nameParts.Add(reader["LastName"].ToString());
+
+                            // Join the name parts with a space and trim any extra spaces
+                            string fullName = string.Join(" ", nameParts);
+
+                            // Build display text
+                            string displayText = $"{fullName} ({reader["EmployeeOfficeID"]})";
+
                             ListItem item = new ListItem(displayText, reader["UserID"].ToString());
                             ddlEmployee.Items.Add(item);
                         }
@@ -83,7 +100,6 @@ namespace LeaveManagementPortal
             }
         }
 
-
         private void LoadLeaveBalances()
         {
             string employeeFilter = string.Empty;
@@ -102,17 +118,22 @@ namespace LeaveManagementPortal
             {
                 // First, we need to get the raw data
                 using (SqlCommand cmd = new SqlCommand($@"
-                    SELECT 
-                        u.UserID,
-                        u.EmployeeOfficeID,
-                        u.Name AS EmployeeName,
-                        lt.LeaveTypeName,
-                        lb.PresentYearBalance
-                    FROM Users u
-                    LEFT JOIN LeaveBalances lb ON u.UserID = lb.UserID
-                    LEFT JOIN LeaveTypes lt ON lb.LeaveTypeID = lt.LeaveTypeID
-                    {employeeFilter}
-                    ORDER BY u.EmployeeOfficeID, u.Name", conn))
+                        SELECT
+                            u.UserID,
+                            u.EmployeeOfficeID,
+                            (COALESCE(u.FirstName, '') +
+                            CASE WHEN u.MiddleName IS NOT NULL AND u.MiddleName<> '' THEN ' ' + u.MiddleName ELSE '' END +
+                            CASE WHEN u.LastName IS NOT NULL AND u.LastName<> '' THEN ' ' + u.LastName ELSE '' END)
+                            AS EmployeeName,
+                                        lt.LeaveTypeName,
+                            lb.PresentYearBalance
+                        FROM Users u
+                        LEFT JOIN LeaveBalances lb ON u.UserID = lb.UserID
+                        LEFT JOIN LeaveTypes lt ON lb.LeaveTypeID = lt.LeaveTypeID
+                        " + employeeFilter + @"
+                        ORDER BY u.EmployeeOfficeID, 
+                                 3",
+                        conn))
                 {
                     conn.Open();
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -175,6 +196,7 @@ namespace LeaveManagementPortal
                 }
             }
         }
+
 
         //private void LoadLeaveTypeSummary()
         //{

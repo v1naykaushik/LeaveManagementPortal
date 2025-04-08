@@ -71,9 +71,20 @@ namespace LeaveManagementPortal
 
                         // Existing credential check code remains exactly the same
                         using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT UserID, Name, Email, Role, ManagerID 
-                    FROM Users 
-                    WHERE Email = @Email AND Password = @Password AND IsActive = 1", conn))
+                    SELECT 
+                        u.UserID, 
+                        u.FirstName, 
+                        u.MiddleName, 
+                        u.LastName, 
+                        u.Email, 
+                        u.Role, 
+                        u.ManagerID, 
+                        d.Name AS DesignationName, 
+                        t.Name AS TitleName 
+                    FROM Users u
+                    LEFT JOIN DesignationMaster d ON u.Designation = d.id
+                    LEFT JOIN TitlesMaster t ON u.Title = t.id
+                    WHERE u.Email = @Email AND u.Password = @Password AND u.IsActive = 1", conn))
                         {
                             // Add parameters to prevent SQL injection
                             cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
@@ -84,10 +95,21 @@ namespace LeaveManagementPortal
                                 if (reader.Read())
                                 {
                                     Session["UserID"] = reader["UserID"].ToString();
-                                    Session["UserName"] = reader["Name"].ToString();
+                                    //Session["UserName"] = reader["Name"].ToString();
                                     Session["UserRole"] = reader["Role"].ToString();
                                     Session["ManagerID"] = reader["ManagerID"].ToString();
+                                    // Concatenating FirstName, MiddleName, and LastName (ignoring null values)
+                                    string fullName = reader["FirstName"].ToString();
+                                    if (!string.IsNullOrEmpty(reader["MiddleName"].ToString()))
+                                        fullName += " " + reader["MiddleName"].ToString();
+                                    if (!string.IsNullOrEmpty(reader["LastName"].ToString()))
+                                        fullName += " " + reader["LastName"].ToString();
 
+                                    Session["UserName"] = fullName.Trim(); // Store formatted name in Session
+
+                                    // Storing Designation and Title Names in Session
+                                    Session["UserDesignation"] = reader["DesignationName"].ToString();
+                                    Session["UserTitle"] = reader["TitleName"].ToString();
                                     FormsAuthentication.SetAuthCookie(reader["Email"].ToString(), false);
 
                                     string userRole = reader["Role"].ToString();

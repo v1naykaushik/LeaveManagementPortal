@@ -33,13 +33,18 @@ namespace LeaveManagementPortal
 
                 // Query for today's leaves
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT u.Name, lt.LeaveTypeName
+                    SELECT 
+                        (COALESCE(u.FirstName, '') +
+                            CASE WHEN u.MiddleName IS NOT NULL AND u.MiddleName<> '' THEN ' ' + u.MiddleName ELSE '' END +
+                            CASE WHEN u.LastName IS NOT NULL AND u.LastName<> '' THEN ' ' + u.LastName ELSE '' END)
+                            AS Name,
+                        lt.LeaveTypeName
                     FROM LeaveApplications la
                     INNER JOIN Users u ON la.UserID = u.UserID
                     INNER JOIN LeaveTypes lt ON la.LeaveTypeID = lt.LeaveTypeID
                     WHERE @Today BETWEEN la.StartDate AND la.EndDate
                     AND la.Status = 'Approved'
-                    ORDER BY u.Name", conn))
+                    ORDER BY Name", conn))
                 {
                     cmd.Parameters.AddWithValue("@Today", DateTime.Today);
 
@@ -62,13 +67,18 @@ namespace LeaveManagementPortal
 
                 // Query for tomorrow's leaves
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT u.Name, lt.LeaveTypeName
+                    SELECT
+                        (COALESCE(u.FirstName, '') +
+                            CASE WHEN u.MiddleName IS NOT NULL AND u.MiddleName<> '' THEN ' ' + u.MiddleName ELSE '' END +
+                            CASE WHEN u.LastName IS NOT NULL AND u.LastName<> '' THEN ' ' + u.LastName ELSE '' END)
+                            AS Name,
+                        lt.LeaveTypeName
                     FROM LeaveApplications la
                     INNER JOIN Users u ON la.UserID = u.UserID
                     INNER JOIN LeaveTypes lt ON la.LeaveTypeID = lt.LeaveTypeID
                     WHERE @Tomorrow BETWEEN la.StartDate AND la.EndDate
                     AND la.Status = 'Approved'
-                    ORDER BY u.Name", conn))
+                    ORDER BY Name", conn))
                 {
                     cmd.Parameters.AddWithValue("@Tomorrow", DateTime.Today.AddDays(1));
 

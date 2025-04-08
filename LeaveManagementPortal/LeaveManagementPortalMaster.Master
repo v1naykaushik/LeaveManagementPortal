@@ -330,7 +330,7 @@
                     <asp:Literal ID="litUserName" runat="server" />
                 </div>
                 <div class="user-role">
-                    <asp:Literal ID="litUserRole" runat="server" />
+                    <asp:Literal ID="litUserDesignation" runat="server" />
                 </div>
             </div>
 

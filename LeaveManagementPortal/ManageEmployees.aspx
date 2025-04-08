@@ -181,11 +181,11 @@
                         <Columns>
                             <asp:BoundField DataField="EmployeeOfficeID" HeaderText="Employee ID" 
                                 ItemStyle-CssClass="employee-id" />
-                            <asp:BoundField DataField="Name" HeaderText="Name" />
+                            <asp:BoundField DataField="FullName" HeaderText="Name" />
                             <asp:BoundField DataField="Email" HeaderText="Email" />
-                            <asp:TemplateField HeaderText="Role">
+                            <asp:TemplateField HeaderText="Designation">
                                 <ItemTemplate>
-                                    <span class="role-badge"><%# Eval("Role") %></span>
+                                    <span class="role-badge"><%# Eval("Designation") %></span>
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Status">

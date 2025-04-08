@@ -33,8 +33,19 @@ namespace LeaveManagementPortal
             {
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT UserID, Name, Email, Role, IsActive, EmployeeOfficeID
-                    FROM Users 
+                    SELECT 
+                        u.UserID,
+                        (COALESCE(t.name + ' ' + u.FirstName, '') +
+                            CASE WHEN u.MiddleName IS NOT NULL AND u.MiddleName<> '' THEN ' ' + u.MiddleName ELSE '' END +
+                            CASE WHEN u.LastName IS NOT NULL AND u.LastName<> '' THEN ' ' + u.LastName ELSE '' END)
+                            AS FullName,
+                        u.Email,
+                        d.name as Designation,
+                        u.IsActive, 
+                        u.EmployeeOfficeID
+                    FROM Users u
+                    LEFT JOIN TitlesMaster t ON u.Title = t.id
+                    LEFT JOIN DesignationMaster d ON u.Designation = d.id
                     ORDER BY EmployeeOfficeID", conn))
                 {
                     using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))

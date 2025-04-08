@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
 using System.Web.UI;
@@ -92,6 +93,113 @@ namespace LeaveManagementPortal
             }
         }
 
+        private List<HolidayInfo> CachedHolidays
+        {
+            get { return ViewState["CachedHolidays"] as List<HolidayInfo> ?? new List<HolidayInfo>(); }
+            set { ViewState["CachedHolidays"] = value; }
+        }
+
+        [Serializable]
+        private class HolidayInfo
+        {
+            public int HolidayID { get; set; }
+            public string HolidayName { get; set; }
+            public DateTime HolidayDate { get; set; }
+            public bool IsRestricted { get; set; }
+        }
+
+        private List<HolidayInfo> GetHolidays(int year)
+        {
+            // Check if we already have the holidays cached
+            List<HolidayInfo> cachedHolidays = CachedHolidays;
+            if (cachedHolidays.Count > 0 && cachedHolidays[0].HolidayDate.Year == year)
+            {
+                return cachedHolidays;
+            }
+
+            List<HolidayInfo> holidays = new List<HolidayInfo>();
+            string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand(@"
+            SELECT 
+                HolidayID,
+                HolidayDate,
+                HolidayName,
+                IsRestricted
+            FROM RestrictedHolidays
+            WHERE YEAR(HolidayDate) = @Year
+            ORDER BY HolidayDate", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Year", year);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            holidays.Add(new HolidayInfo
+                            {
+                                HolidayID = Convert.ToInt32(reader["HolidayID"]),
+                                HolidayName = reader["HolidayName"].ToString(),
+                                HolidayDate = Convert.ToDateTime(reader["HolidayDate"]),
+                                IsRestricted = Convert.ToBoolean(reader["IsRestricted"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Cache the holidays
+            CachedHolidays = holidays;
+            return holidays;
+        }
+
+
+
+        //private void GenerateLeaveCalendar()
+        //{
+        //    // Get the current year
+        //    int year = DateTime.Now.Year;
+
+        //    // Get leave data
+        //    List<LeaveInfo> leaveData = CachedLeaves;
+
+        //    // Create a dictionary to store leave information by date
+        //    Dictionary<DateTime, List<LeaveInfo>> leaveDates = new Dictionary<DateTime, List<LeaveInfo>>();
+
+        //    // Process leave data
+        //    foreach (LeaveInfo leave in leaveData)
+        //    {
+        //        DateTime startDate = leave.StartDate;
+        //        DateTime endDate = leave.EndDate;
+
+        //        // Loop through all days in the leave period
+        //        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+        //        {
+        //            if (!leaveDates.ContainsKey(date))
+        //            {
+        //                leaveDates[date] = new List<LeaveInfo>();
+        //            }
+
+        //            leaveDates[date].Add(leave);
+        //        }
+        //    }
+
+        //    // Generate HTML for the calendar
+        //    StringBuilder calendarHtml = new StringBuilder();
+
+        //    // Generate a calendar for each month
+        //    for (int month = 1; month <= 12; month++)
+        //    {
+        //        calendarHtml.Append(GenerateMonthCalendar(year, month, leaveDates));
+        //    }
+
+        //    // Set the HTML
+        //    yearCalendar.InnerHtml = calendarHtml.ToString();
+        //}
+
         private void GenerateLeaveCalendar()
         {
             // Get the current year
@@ -99,6 +207,9 @@ namespace LeaveManagementPortal
 
             // Get leave data
             List<LeaveInfo> leaveData = CachedLeaves;
+
+            // Ensure holidays are loaded for the year
+            GetHolidays(year);
 
             // Create a dictionary to store leave information by date
             Dictionary<DateTime, List<LeaveInfo>> leaveDates = new Dictionary<DateTime, List<LeaveInfo>>();
@@ -133,6 +244,97 @@ namespace LeaveManagementPortal
             // Set the HTML
             yearCalendar.InnerHtml = calendarHtml.ToString();
         }
+
+        //private string GenerateMonthCalendar(int year, int month, Dictionary<DateTime, List<LeaveInfo>> leaveDates)
+        //{
+        //    StringBuilder html = new StringBuilder();
+
+        //    // Start month container
+        //    html.Append("<div class='month-calendar'>");
+
+        //    // Month header
+        //    html.AppendFormat("<div class='month-header'>{0}</div>", new DateTime(year, month, 1).ToString("MMMM"));
+
+        //    // Day headers
+        //    html.Append("<div class='month-days'>");
+        //    string[] dayNames = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+        //    foreach (string dayName in dayNames)
+        //    {
+        //        html.AppendFormat("<div class='day-header'>{0}</div>", dayName);
+        //    }
+
+        //    // Calculate first day of the month
+        //    DateTime firstDay = new DateTime(year, month, 1);
+
+        //    // Get the day of week for the first day (0 = Sunday, 6 = Saturday)
+        //    int firstDayOfWeek = (int)firstDay.DayOfWeek;
+
+        //    // Get the number of days in the month
+        //    int daysInMonth = DateTime.DaysInMonth(year, month);
+
+        //    // Calculate previous month days to display
+        //    DateTime prevMonth = firstDay.AddMonths(-1);
+        //    int daysInPrevMonth = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
+
+        //    // Generate calendar days
+        //    int currentDay = 1;
+        //    int nextMonthDay = 1;
+
+        //    // Total cells needed (max 6 weeks × 7 days)
+        //    for (int i = 0; i < 42; i++)
+        //    {
+        //        // Determine if it's a weekend
+        //        bool isWeekend = i % 7 == 0 || i % 7 == 6; // Sunday or Saturday
+        //        string weekendClass = isWeekend ? "weekend" : "";
+
+        //        if (i < firstDayOfWeek)
+        //        {
+        //            // Previous month
+        //            int prevMonthDay = daysInPrevMonth - firstDayOfWeek + i + 1;
+        //            html.AppendFormat("<div class='calendar-day {0} other-month'>{1}</div>", weekendClass, prevMonthDay);
+        //        }
+        //        else if (currentDay <= daysInMonth)
+        //        {
+        //            // Current month
+        //            DateTime currentDate = new DateTime(year, month, currentDay);
+        //            string leaveClass = "";
+        //            string tooltipHtml = "";
+
+        //            if (leaveDates.ContainsKey(currentDate))
+        //            {
+        //                List<LeaveInfo> leaves = leaveDates[currentDate];
+        //                LeaveInfo leave = leaves[0]; // Just show the first leave if multiple exist
+
+        //                string leaveColor = GetLeaveTypeClass(leave.LeaveType);
+        //                string statusClass = leave.Status == "Pending" ? "pending-color" : leaveColor;
+
+        //                leaveClass = "leave-day " + statusClass;
+        //                tooltipHtml = $"<span class='leave-day-tooltip'>{leave.LeaveType} ({leave.Status})<br>{leave.StartDate.ToShortDateString()} - {leave.EndDate.ToShortDateString()}</span>";
+        //            }
+
+        //            html.AppendFormat("<div class='calendar-day {0} {1}'>{2}{3}</div>",
+        //                weekendClass, leaveClass, currentDay, tooltipHtml);
+        //            currentDay++;
+        //        }
+        //        else
+        //        {
+        //            // Next month
+        //            html.AppendFormat("<div class='calendar-day {0} other-month'>{1}</div>", weekendClass, nextMonthDay);
+        //            nextMonthDay++;
+        //        }
+
+        //        // End after displaying all days of the current month and completing the row
+        //        if (currentDay > daysInMonth && i % 7 == 6)
+        //        {
+        //            break;
+        //        }
+        //    }
+
+        //    html.Append("</div>"); // Close month-days
+        //    html.Append("</div>"); // Close month-calendar
+
+        //    return html.ToString();
+        //}
 
         private string GenerateMonthCalendar(int year, int month, Dictionary<DateTime, List<LeaveInfo>> leaveDates)
         {
@@ -186,10 +388,19 @@ namespace LeaveManagementPortal
                 {
                     // Current month
                     DateTime currentDate = new DateTime(year, month, currentDay);
-                    string leaveClass = "";
+                    string dayClass = weekendClass;
                     string tooltipHtml = "";
 
-                    if (leaveDates.ContainsKey(currentDate))
+                    // Check for holiday
+                    HolidayInfo holiday = GetHolidayInfo(currentDate);
+                    if (holiday != null)
+                    {
+                        string holidayClass = holiday.IsRestricted ? "restricted-holiday" : "gazetted-holiday";
+                        dayClass += " " + holidayClass;
+                        tooltipHtml = $"<span class='holiday-tooltip'>{holiday.HolidayName} ({(holiday.IsRestricted ? "Restricted" : "Gazetted")})</span>";
+                    }
+                    // Check if user has leave on this date (leave takes precedence in visual display)
+                    else if (leaveDates.ContainsKey(currentDate))
                     {
                         List<LeaveInfo> leaves = leaveDates[currentDate];
                         LeaveInfo leave = leaves[0]; // Just show the first leave if multiple exist
@@ -197,12 +408,12 @@ namespace LeaveManagementPortal
                         string leaveColor = GetLeaveTypeClass(leave.LeaveType);
                         string statusClass = leave.Status == "Pending" ? "pending-color" : leaveColor;
 
-                        leaveClass = "leave-day " + statusClass;
+                        dayClass += " leave-day " + statusClass;
                         tooltipHtml = $"<span class='leave-day-tooltip'>{leave.LeaveType} ({leave.Status})<br>{leave.StartDate.ToShortDateString()} - {leave.EndDate.ToShortDateString()}</span>";
                     }
 
-                    html.AppendFormat("<div class='calendar-day {0} {1}'>{2}{3}</div>",
-                        weekendClass, leaveClass, currentDay, tooltipHtml);
+                    html.AppendFormat("<div class='calendar-day {0}'>{1}{2}</div>",
+                        dayClass, currentDay, tooltipHtml);
                     currentDay++;
                 }
                 else
@@ -355,7 +566,7 @@ namespace LeaveManagementPortal
             pnlMedicalLeaveInfo.Visible = selectedLeaveType == "3"; // Medical Leave
 
             // Show/hide restricted leave calendar link and manage end date
-            pnlRestrictedLeave.Visible = selectedLeaveType == "4"; // RL
+            //pnlRestrictedLeave.Visible = selectedLeaveType == "4"; // RL
             if (selectedLeaveType == "4") // RL
             {
                 txtEndDate.Text = txtStartDate.Text;
@@ -697,6 +908,8 @@ namespace LeaveManagementPortal
 
                         ScriptManager.RegisterStartupScript(this, GetType(), "LeaveApplied",
                             "alert('Leave application submitted successfully.');", true);
+                        CacheExistingLeaves();
+                        GenerateLeaveCalendar();
                     }
                     catch (Exception ex)
                     {
@@ -744,22 +957,40 @@ namespace LeaveManagementPortal
             return false;
         }
 
+        //private bool IsRestrictedHoliday(DateTime date)
+        //{
+        //    string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
+        //    using (SqlConnection conn = new SqlConnection(connectionString))
+        //    {
+        //        conn.Open();
+        //        using (SqlCommand cmd = new SqlCommand(@"
+        //            SELECT COUNT(*)
+        //            FROM RestrictedHolidays
+        //            WHERE HolidayDate = @Date", conn))
+        //        {
+        //            cmd.Parameters.AddWithValue("@Date", date.Date);
+        //            int count = (int)cmd.ExecuteScalar();
+        //            return count > 0;
+        //        }
+        //    }
+        //}
+
         private bool IsRestrictedHoliday(DateTime date)
         {
-            string connectionString = ConfigurationManager.ConnectionStrings["LeaveManagementDB"].ConnectionString;
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-                using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT COUNT(*)
-                    FROM RestrictedHolidays
-                    WHERE HolidayDate = @Date", conn))
-                {
-                    cmd.Parameters.AddWithValue("@Date", date.Date);
-                    int count = (int)cmd.ExecuteScalar();
-                    return count > 0;
-                }
-            }
+            List<HolidayInfo> holidays = GetHolidays(date.Year);
+            return holidays.Any(h => h.HolidayDate.Date == date.Date && h.IsRestricted);
+        }
+
+        private bool IsGazettedHoliday(DateTime date)
+        {
+            List<HolidayInfo> holidays = GetHolidays(date.Year);
+            return holidays.Any(h => h.HolidayDate.Date == date.Date && !h.IsRestricted);
+        }
+        //optional helper may not use it.
+        private HolidayInfo GetHolidayInfo(DateTime date)
+        {
+            List<HolidayInfo> holidays = GetHolidays(date.Year);
+            return holidays.FirstOrDefault(h => h.HolidayDate.Date == date.Date);
         }
     }
 }

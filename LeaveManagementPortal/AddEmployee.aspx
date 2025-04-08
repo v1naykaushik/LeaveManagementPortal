@@ -36,10 +36,10 @@
             transition: all 0.3s ease;
         }
 
-        .form-control:focus {
-            border-color: #1a237e;
-            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
-        }
+            .form-control:focus {
+                border-color: #1a237e;
+                box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
+            }
 
         .form-select {
             border: 1px solid #e2e8f0;
@@ -48,10 +48,10 @@
             transition: all 0.3s ease;
         }
 
-        .form-select:focus {
-            border-color: #1a237e;
-            box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
-        }
+            .form-select:focus {
+                border-color: #1a237e;
+                box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2);
+            }
 
         .validation-error {
             color: #dc3545;
@@ -69,14 +69,14 @@
             border: 1px solid #c3e6cb;
         }
 
-        .success-message .password-display {
-            background-color: #ffffff;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            margin-top: 0.5rem;
-            font-family: monospace;
-            border: 1px solid #c3e6cb;
-        }
+            .success-message .password-display {
+                background-color: #ffffff;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                margin-top: 0.5rem;
+                font-family: monospace;
+                border: 1px solid #c3e6cb;
+            }
 
         .btn-submit {
             background-color: #1a237e;
@@ -89,14 +89,14 @@
             transition: all 0.3s ease;
         }
 
-        .btn-submit:hover {
-            background-color: #151c5e;
-            transform: translateY(-1px);
-        }
+            .btn-submit:hover {
+                background-color: #151c5e;
+                transform: translateY(-1px);
+            }
 
-        .btn-submit:active {
-            transform: translateY(0);
-        }
+            .btn-submit:active {
+                transform: translateY(0);
+            }
     </style>
 </asp:Content>
 
@@ -109,31 +109,71 @@
             <asp:Panel ID="pnlSuccess" runat="server" CssClass="success-message" Visible="false">
                 <div><i class="fas fa-check-circle me-2"></i>Employee added successfully! The account details have been set up.</div>
                 <div class="password-display">
-                    Generated Password: <asp:Label ID="lblGeneratedPassword" runat="server" Font-Bold="true"></asp:Label>
+                    Generated Password:
+                    <asp:Label ID="lblGeneratedPassword" runat="server" Font-Bold="true"></asp:Label>
                 </div>
             </asp:Panel>
 
             <!-- Employee Details Form -->
+
+
             <div class="form-section">
-                <div class="mb-4">
-                    <label for="txtName" class="form-label">Full Name</label>
-                    <asp:TextBox ID="txtName" runat="server" CssClass="form-control" placeholder="Enter employee's full name" />
-                    <asp:RequiredFieldValidator ID="rfvName" runat="server" 
-                        ControlToValidate="txtName"
+                <div class="row mb-6">
+                    <div class="col-md-3">
+                        <label for="ddlTitle" class="form-label">Title</label>
+                        <asp:DropDownList ID="ddlTitle" runat="server" CssClass="form-select">
+                        </asp:DropDownList>
+                        <asp:RequiredFieldValidator ID="rfvTitle" runat="server"
+                            ControlToValidate="ddlTitle"
+                            InitialValue=""
+                            CssClass="validation-error"
+                            Display="Dynamic"
+                            ErrorMessage="Please select a title." />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txtFirstName" class="form-label">First Name</label>
+                        <asp:TextBox ID="txtFirstName" runat="server" CssClass="form-control" placeholder="Enter employee's first name" />
+                        <asp:RequiredFieldValidator ID="rfvName" runat="server"
+                            ControlToValidate="txtFirstName"
+                            CssClass="validation-error"
+                            Display="Dynamic"
+                            ErrorMessage="Name is required." />
+                    </div>
+                </div>
+                <div class="row mb-6">
+                    <div class="mb-4">
+                        <label for="txtMiddleName" class="form-label">Middle Name</label>
+                        <asp:TextBox ID="txtMiddleName" runat="server" CssClass="form-control" placeholder="Enter employee's Middle name" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="txtLastName" class="form-label">Last Name</label>
+                        <asp:TextBox ID="txtLastName" runat="server" CssClass="form-control" placeholder="Enter employee's Last name" />
+                    </div>
+                </div>
+
+                  <div class="mb-4">
+                    <label for="ddlDesignation" class="form-label">Designation</label>
+                    <asp:DropDownList ID="ddlDesignation" runat="server" CssClass="form-select">
+                    </asp:DropDownList>
+                    <asp:RequiredFieldValidator ID="rfvDesignation" runat="server"
+                        ControlToValidate="ddlDesignation"
                         CssClass="validation-error"
                         Display="Dynamic"
-                        ErrorMessage="Name is required." />
+                        ErrorMessage="Please select a Designation."
+                        InitialValue="" />
                 </div>
 
                 <div class="mb-4">
                     <label for="txtEmail" class="form-label">Email Address</label>
                     <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="Enter employee's email address" />
-                    <asp:RequiredFieldValidator ID="rfvEmail" runat="server" 
+                    <asp:RequiredFieldValidator ID="rfvEmail" runat="server"
                         ControlToValidate="txtEmail"
                         CssClass="validation-error"
                         Display="Dynamic"
                         ErrorMessage="Email is required." />
-                    <asp:RegularExpressionValidator ID="revEmail" runat="server" 
+                    <asp:RegularExpressionValidator ID="revEmail" runat="server"
                         ControlToValidate="txtEmail"
                         CssClass="validation-error"
                         Display="Dynamic"
@@ -144,7 +184,7 @@
                 <div class="mb-4">
                     <label for="txtEmployeeId" class="form-label">Employee Office ID</label>
                     <asp:TextBox ID="txtEmployeeId" runat="server" CssClass="form-control" placeholder="Enter employee's office ID" />
-                    <asp:RequiredFieldValidator ID="rfvEmployeeId" runat="server" 
+                    <asp:RequiredFieldValidator ID="rfvEmployeeId" runat="server"
                         ControlToValidate="txtEmployeeId"
                         CssClass="validation-error"
                         Display="Dynamic"
@@ -155,19 +195,19 @@
                     <label for="ddlManager" class="form-label">Reporting Manager</label>
                     <asp:DropDownList ID="ddlManager" runat="server" CssClass="form-select">
                     </asp:DropDownList>
-                    <asp:RequiredFieldValidator ID="rfvManager" runat="server" 
+                    <asp:RequiredFieldValidator ID="rfvManager" runat="server"
                         ControlToValidate="ddlManager"
                         CssClass="validation-error"
                         Display="Dynamic"
-                        ErrorMessage="Please select a manager." 
+                        ErrorMessage="Please select a manager."
                         InitialValue="" />
                 </div>
             </div>
 
             <!-- Submit Button -->
             <div class="form-section mb-3">
-                <asp:Button ID="btnAddEmployee" runat="server" 
-                    Text="Add Employee" 
+                <asp:Button ID="btnAddEmployee" runat="server"
+                    Text="Add"
                     CssClass="btn-submit"
                     OnClick="btnAddEmployee_Click" />
             </div>

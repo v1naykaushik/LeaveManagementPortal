@@ -105,33 +105,6 @@ namespace LeaveManagementPortal
         protected global::System.Web.UI.WebControls.CustomValidator cvEndDate;
 
         /// <summary>
-        /// chkHalfDay control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkHalfDay;
-
-        /// <summary>
-        /// pnlRestrictedLeave control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlRestrictedLeave;
-
-        /// <summary>
-        /// lnkViewHolidays control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink lnkViewHolidays;
-
-        /// <summary>
         /// txtReason control.
         /// </summary>
         /// <remarks>
@@ -139,6 +112,15 @@ namespace LeaveManagementPortal
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtReason;
+
+        /// <summary>
+        /// chkHalfDay control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkHalfDay;
 
         /// <summary>
         /// btnApplyLeave control.

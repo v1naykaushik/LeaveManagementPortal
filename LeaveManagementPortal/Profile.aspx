@@ -129,6 +129,12 @@
                     </div>
                 </div>
                 <div class="info-row">
+                    <div class="info-label">Designation:</div>
+                    <div class="info-value">
+                        <asp:Label ID="lblDesignation" runat="server"></asp:Label>
+                    </div>
+                </div>
+                <div class="info-row">
                     <div class="info-label">Email:</div>
                     <div class="info-value">
                         <asp:Label ID="lblEmail" runat="server"></asp:Label>

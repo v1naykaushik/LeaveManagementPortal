@@ -30,9 +30,7 @@ namespace LeaveManagementPortal
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand(@"
                     SELECT 
-                        u.Name,
                         u.Email,
-                        u.Role,
                         u.EmployeeOfficeID,
                         m.Name as ManagerName
                     FROM Users u
@@ -41,13 +39,34 @@ namespace LeaveManagementPortal
                 {
                     cmd.Parameters.AddWithValue("@UserID", userId);
 
+                    /////////
+                    //@"
+                    //SELECT 
+                    //    u.UserID, 
+                    //    u.FirstName, 
+                    //    u.MiddleName, 
+                    //    u.LastName, 
+                    //    u.Email, 
+                    //    u.Role, 
+                    //    u.ManagerID, 
+                    //    d.Name AS DesignationName, 
+                    //    t.Name AS TitleName 
+                    //FROM Users u
+                    //LEFT JOIN DesignationMaster d ON u.Designation = d.id
+                    //LEFT JOIN TitlesMaster t ON u.Title = t.id
+                    //WHERE u.Email = @Email AND u.Password = @Password AND u.IsActive = 1"
+                    ///
+
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            lblName.Text = reader["Name"].ToString();
+                            //lblName.Text = reader["Name"].ToString();
+                            lblName.Text = Session["UserTitle"]?.ToString() +" "+ Session["UserName"]?.ToString();
+                            lblDesignation.Text = Session["UserDesignation"]?.ToString();
                             lblEmail.Text = reader["Email"].ToString();
-                            lblRole.Text = reader["Role"].ToString();
+                            //lblRole.Text = reader["Role"].ToString();
+                            lblRole.Text = Session["UserRole"]?.ToString();
                             lblEmployeeId.Text = reader["EmployeeOfficeID"].ToString();
                             lblManager.Text = reader["ManagerName"] != DBNull.Value
                                 ? reader["ManagerName"].ToString()

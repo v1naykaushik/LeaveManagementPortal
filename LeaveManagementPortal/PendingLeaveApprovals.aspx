@@ -156,7 +156,7 @@
             backdrop-filter: blur(5px); /* Adds frosted glass effect */
             padding: 15px 30px; /* Increased horizontal padding */
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             /*            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);*/
             z-index: 1000;
@@ -221,47 +221,6 @@
             color: #666;
             font-size: 0.9rem;
         }
-
-        /* Modal Styles */
-        /*.detail-card {
-            position: relative;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 3px solid #1a237e;
-            background: #fff;
-        }
-
-        .detail-card-title {
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            color: #1a237e;
-            font-size: 0.9rem;
-            font-weight: 600;
-            background: #fff;
-            padding: 0 10px;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .detail-label {
-            color: #666;
-            font-size: 0.8rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .detail-value {
-            color: #2c3e50;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }*/
-
-        /*        .approval-status {
-            padding: 1rem;
-            background: white;
-            border-radius: 4px;
-            border: 1px solid #e9ecef;
-        }*/
 
         .modal-header {
             background: #1a237e;
@@ -345,18 +304,6 @@
                     </button>
                 </div>
 
-                <%--<div class="search-container">
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" ID="txtSearch" runat="server" 
-                            class="form-control" placeholder="Search employee or leave type" />
-                        <asp:Button ID="btnSearch" runat="server" 
-                            Text="Search" CssClass="btn btn-primary" 
-                            OnClick="btnSearch_Click" />
-                        <asp:Button ID="btnClearSearch" runat="server" 
-                            Text="Clear" CssClass="btn btn-outline-secondary" 
-                            OnClick="btnClearSearch_Click" />
-                    </div>
-                </div>--%>
 
                 <!-- Pending Leaves Grid -->
                 <div class="row">
@@ -373,20 +320,7 @@
                                         </div>
 
                                         <!-- Leave Info -->
-                                        <div class="leave-info"
-                                            <%--onclick="showLeaveDetails('<%# HttpUtility.JavaScriptStringEncode(Eval("EmployeeName").ToString()) %>', 
-                                                                      '<%# HttpUtility.JavaScriptStringEncode(Eval("LeaveTypeName").ToString()) %>', 
-                                                                      '<%# Eval("StartDate", "{0:dd MMM yyyy}") %>', 
-                                                                      '<%# Eval("EndDate", "{0:dd MMM yyyy}") %>', 
-                                                                      '<%# Eval("Duration") %>', 
-                                                                      '<%# HttpUtility.JavaScriptStringEncode(Eval("EmployeeId").ToString()) %>', 
-                                                                      '<%# HttpUtility.JavaScriptStringEncode((Eval("LeaveReason") ?? "").ToString()) %>', 
-                                                                      <%# Eval("IsHalfDay").ToString().ToLower() %>, 
-                                                                      '<%# Eval("ManagerApprovalStatus") %>', 
-                                                                      '<%# Eval("DirectorApprovalStatus") %>',
-                                                                      '<%# Eval("LeaveID") %>')"--%>
-                                            <%--style="cursor: pointer;"--%>
-                                            >
+                                        <div class="leave-info">
                                             <!-- Employee Info -->
                                             <div class="employee-info">
                                                 <span class="employee-name"><%# Eval("EmployeeName") %></span>
@@ -444,89 +378,14 @@
 
         <!-- Save Button Container -->
         <div class="save-button-container">
-            <span class="selection-count">0 leaves selected</span>
+            <span class="selection-count"></span>
             <asp:Button ID="btnSaveChanges" runat="server" Text="Save Changes"
                 CssClass="btn-save" OnClientClick="return setHiddenField();" OnClick="btnSaveChanges_Click" Enabled="false" />
             <%--<asp:Button ID="btnTestApprove" runat="server" Text="Test Approve Leave 1011"
                 OnClick="btnTestApprove_Click" CssClass="btn btn-warning" />--%>
         </div>
 
-        <!-- Leave Details Modal -->
-        <%--<div class="modal fade" id="leaveDetailsModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">
-                            <i class="fas fa-calendar-alt me-2"></i>Leave Request Details
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row g-4">
-                            <!-- Employee Information -->
-                            <div class="col-md-12">
-                                <div class="detail-card">
-                                    <h6 class="detail-card-title">
-                                        <i class="fas fa-calendar-check me-2"></i>Employee Information
-                                    </h6>
-                                    <div class="row gy-2">
-                                        <div class="col-6">
-                                            <label class="detail-label">Name</label>
-                                            <div class="detail-value" id="modalEmployeeName"></div>
-                                        </div>
-                                        <div class="col-6">
-                                            <label class="detail-label">Employee ID</label>
-                                            <div class="detail-value" id="modalEmployeeId"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Leave Information -->
-                            <div class="col-md-12">
-                                <div class="detail-card">
-                                    <h6 class="detail-card-title">
-                                        <i class="fas fa-calendar-check me-2"></i>Leave Details
-                                    </h6>
-                                    <div class="row g-3">
-                                        <div class="col-6">
-                                            <label class="detail-label">Leave ID</label>
-                                            <div class="detail-value" id="modalLeaveId"></div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="detail-label">Leave Type</label>
-                                            <div class="detail-value" id="modalLeaveType"></div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="detail-label">Duration</label>
-                                            <div class="detail-value" id="modalDuration"></div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="detail-label">Leave Period</label>
-                                            <div class="detail-value" id="modalDates"></div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="detail-label">Reason for Leave</label>
-                                            <div class="detail-value" id="modalReason"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Approval Status -->
-                            <div class="col-md-12">
-                                <div class="detail-card">
-                                    <h6 class="detail-card-title">
-                                        <i class="fas fa-check-circle me-2"></i>Approval Status
-                                    </h6>
-                                    <div class="approval-status" id="modalApprovalStatus"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>--%>
+        
     </div>
 
     <script type="text/javascript">
@@ -546,35 +405,12 @@
             });
         }
 
-        //function toggleAllCheckboxes() {
-        //    var checkboxes = document.querySelectorAll('.tile-checkbox');
-        //    var selectAllChecked = document.getElementById('selectAll').checked;
-
-        //    checkboxes.forEach(function (checkbox) {
-        //        if (checkbox.dataset.leaveid) {
-        //            checkbox.checked = selectAllChecked;
-        //            if (selectAllChecked) {
-        //                selectedLeaves.add(checkbox.dataset.leaveid);
-        //            } else {
-        //                selectedLeaves.delete(checkbox.dataset.leaveid);
-        //                delete pendingActions[checkbox.dataset.leaveid];
-
-        //                // Reset button states
-        //                const approveBtn = document.querySelector(`button[onclick*="markForAction(${checkbox.dataset.leaveid}, 'approve')"]`);
-        //                const rejectBtn = document.querySelector(`button[onclick*="markForAction(${checkbox.dataset.leaveid}, 'reject')"]`);
-        //                if (approveBtn) approveBtn.classList.remove('faded');
-        //                if (rejectBtn) rejectBtn.classList.remove('faded');
-        //            }
-        //        }
-        //    });
-
-        //    updateSelectedCount();
-        //}
-
         function updateSelectedCount() {
+            console.log("here in updateSelectedCount");
             var hasActions = Object.keys(pendingActions).length > 0;
             var countText = selectedLeaves.size + ' leaves selected';
-            document.querySelector('.selection-count').textContent = countText;
+            console.log("Debug: count of selected", countText);
+            document.querySelector('.selection-count').textContent = "";
             console.log("Selected Leaves Size:", selectedLeaves.size, selectedLeaves);
 
             // Enable/disable save button
@@ -671,35 +507,7 @@
             updateSelectedCount();
         }
 
-        //function showLeaveDetails(employeeName, leaveType, startDate, endDate, duration, employeeId, reason, isHalfDay, managerStatus, directorStatus, leaveId) {
-        //    console.log("Function called with:", { employeeName, leaveType, startDate, endDate, duration, employeeId, reason, isHalfDay, managerStatus, directorStatus });
-
-        //    try {
-        //        document.getElementById('modalEmployeeName').textContent = employeeName;
-        //        document.getElementById('modalEmployeeId').textContent = employeeId;
-        //        document.getElementById('modalLeaveType').textContent = leaveType;
-        //        document.getElementById('modalDuration').textContent = isHalfDay ? 'Half Day' : Math.round(duration) + (duration === '1.0' ? ' day' : ' days');
-        //        document.getElementById('modalDates').textContent = startDate + (startDate !== endDate ? ' - ' + endDate : '');
-        //        document.getElementById('modalReason').textContent = reason || 'No reason provided';
-        //        document.getElementById('modalLeaveId').textContent = leaveId;
-
-        //        // Format approval status
-        //        let approvalStatus = 'Manager: ' + managerStatus;
-        //        if (managerStatus === 'Approved') {
-        //            approvalStatus += ' | Director: ' + directorStatus;
-        //        }
-        //        document.getElementById('modalApprovalStatus').textContent = approvalStatus;
-
-        //        // Create and show modal
-        //        const modalElement = document.getElementById('leaveDetailsModal');
-        //        const modal = new bootstrap.Modal(modalElement);
-        //        modal.show();
-
-        //        console.log("Modal should be visible now");
-        //    } catch (error) {
-        //        console.error("Error in showLeaveDetails:", error);
-        //    }
-        //}
+        
 
         // Function to prepare data for submission
         function prepareSubmissionData() {
@@ -728,7 +536,10 @@
             };
 
             hiddenField.value = JSON.stringify(data);
-            console.log('Setting hidden field value:', hiddenField.value);
+            //console.log('Setting hidden field value:', hiddenField.value);
+            if (window.location.hostname === 'localhost') {
+                console.log('Setting hidden field value:', hiddenField.value);
+            }
             return true;
         }
     </script>

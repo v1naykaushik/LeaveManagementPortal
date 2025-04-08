@@ -21,6 +21,8 @@ namespace LeaveManagementPortal
                 // Get user information from session
                 string userRole = Session["UserRole"]?.ToString();
                 string userName = Session["UserName"]?.ToString();
+                string userDesignation = Session["UserDesignation"]?.ToString();
+                string userTitle = Session["UserTitle"]?.ToString();
 
                 if (string.IsNullOrEmpty(userRole) || string.IsNullOrEmpty(userName))
                 {
@@ -31,8 +33,8 @@ namespace LeaveManagementPortal
                 }
 
                 // Set user information in the UI
-                litUserName.Text = userName;
-                litUserRole.Text = userRole;
+                litUserName.Text = userTitle + " " + userName;
+                litUserDesignation.Text = userDesignation;
 
                 // Configure menu visibility based on user role
                 ConfigureMenuVisibility(userRole);

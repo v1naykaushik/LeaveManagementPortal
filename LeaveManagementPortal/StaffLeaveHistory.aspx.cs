@@ -39,7 +39,11 @@ namespace LeaveManagementPortal
             {
                 conn.Open();
                 using (SqlCommand cmd = new SqlCommand(@"
-                    SELECT UserID, Name 
+                    SELECT UserID, 
+                        (COALESCE(FirstName, '') +
+                            CASE WHEN MiddleName IS NOT NULL AND MiddleName<> '' THEN ' ' + MiddleName ELSE '' END +
+                            CASE WHEN LastName IS NOT NULL AND LastName<> '' THEN ' ' + LastName ELSE '' END)
+                            AS Name
                     FROM Users 
                     WHERE Role = 'Employee' AND IsActive = 1 
                     ORDER BY Name", conn))
@@ -95,7 +99,10 @@ namespace LeaveManagementPortal
                 conn.Open();
                 string query = @"
                     SELECT 
-                        u.Name as EmployeeName,
+                        (COALESCE(u.FirstName, '') +
+                            CASE WHEN u.MiddleName IS NOT NULL AND u.MiddleName<> '' THEN ' ' + u.MiddleName ELSE '' END +
+                            CASE WHEN u.LastName IS NOT NULL AND u.LastName<> '' THEN ' ' + u.LastName ELSE '' END)
+                            AS EmployeeName,
                         lt.LeaveTypeName,
                         la.StartDate,
                         la.EndDate,
